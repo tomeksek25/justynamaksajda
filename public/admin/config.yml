@@ -1,0 +1,186 @@
+# Sveltia CMS configuration – https://sveltiacms.app/en/docs
+# The admin panel lives at /admin/. Every save is a Git commit; Netlify rebuilds the site in ~1–2 minutes.
+
+backend:
+  name: github
+  repo: tomeksek25/justynamaksajda
+  branch: main
+  commit_messages:
+    create: 'Add {{collection}} “{{slug}}”'
+    update: 'Update {{collection}} “{{slug}}”'
+    delete: 'Delete {{collection}} “{{slug}}”'
+    uploadMedia: 'Upload “{{path}}”'
+    deleteMedia: 'Delete “{{path}}”'
+
+logo:
+  src: /favicon.svg
+
+# Fallback location for uploads; each collection below sets its own folder.
+media_folder: src/assets/uploads
+public_folder: /src/assets/uploads
+
+media_libraries:
+  default:
+    config:
+      max_file_size: 40000000
+      slugify_filename: true
+      # Phone and camera photos are resized and converted in the browser before upload.
+      transformations:
+        raster_image:
+          format: webp
+          quality: 88
+          width: 2400
+          height: 2400
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: works
+    label: Works
+    label_singular: Work
+    description: Paintings and other works shown in the gallery.
+    folder: src/content/works
+    create: true
+    delete: true
+    slug: '{{title}}'
+    # Images are stored next to the site sources so they are optimised at build time.
+    media_folder: ../../assets/works
+    public_folder: ../../assets/works
+    thumbnail: image
+    summary: '{{title}} — {{year}}'
+    sortable_fields:
+      fields: [year, title, order, series]
+      default:
+        field: year
+        direction: descending
+    view_groups:
+      - label: Series
+        field: series
+      - label: Year
+        field: year
+    view_filters:
+      - label: Available
+        field: availability
+        pattern: available
+      - label: Sold
+        field: availability
+        pattern: sold
+      - label: On home page
+        field: featured
+        pattern: true
+      - label: Hidden
+        field: draft
+        pattern: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: image
+        label: Image
+        widget: image
+        # Only formats Astro can process; phones convert HEIC to JPEG when this list is given.
+        accept: image/jpeg,image/png,image/webp,image/avif
+        hint: Upload a good photo of the work (JPG, PNG or WebP). It is resized automatically.
+      - name: year
+        label: Year
+        widget: string
+        required: false
+        hint: For example 2024 or 2023–2024.
+      - name: series
+        label: Series
+        widget: select
+        default: large-formats
+        options:
+          - { label: Large formats, value: large-formats }
+          - { label: Painting sketches, value: painting-sketches }
+          - { label: Other works, value: other-works }
+          - { label: Photography, value: photography }
+      - name: medium
+        label: Medium
+        widget: string
+        required: false
+        hint: For example “Acrylic and oil on canvas”.
+      - name: dimensions
+        label: Dimensions
+        widget: string
+        required: false
+        hint: For example “140 × 140 cm”.
+      - name: availability
+        label: Availability
+        widget: select
+        required: false
+        hint: Leave empty to show nothing. Sold and “not for sale” works don't show the enquiry buttons.
+        options:
+          - { label: Available, value: available }
+          - { label: Reserved, value: reserved }
+          - { label: Sold, value: sold }
+          - { label: Not for sale, value: nfs }
+      - name: price
+        label: Price
+        widget: string
+        required: false
+        hint: Optional, for example “2 400 PLN”. Leave empty to hide the price.
+      - name: body
+        label: Description
+        widget: markdown
+        required: false
+        hint: Optional text shown next to the work.
+        buttons: [bold, italic, link, bulleted-list]
+        editor_components: []
+      - name: imageAlt
+        label: Image description for screen readers
+        widget: string
+        required: false
+        hint: Optional. If empty, the title, year, medium and dimensions are used.
+      - name: featured
+        label: Show on the home page slideshow
+        widget: boolean
+        default: false
+        required: false
+      - name: order
+        label: Order
+        widget: number
+        value_type: int
+        default: 100
+        required: false
+        hint: Works are sorted by year (newest first). Within the same year, lower numbers come first.
+      - name: draft
+        label: Hide from the website
+        widget: boolean
+        default: false
+        required: false
+
+  - name: pages
+    label: Pages
+    files:
+      - name: about
+        label: About
+        file: src/content/pages/about.md
+        media_folder: ../../assets/pages
+        public_folder: ../../assets/pages
+        fields:
+          - { name: title, label: Page title, widget: string }
+          - { name: portrait, label: Portrait photo, widget: image, required: false, accept: "image/jpeg,image/png,image/webp,image/avif" }
+          - { name: portraitCaption, label: Portrait caption, widget: string, required: false }
+          - { name: body, label: Text, widget: markdown }
+
+  - name: settings
+    label: Settings
+    files:
+      - name: site
+        label: Site details & contact
+        file: src/data/settings.json
+        format: json
+        fields:
+          - { name: artistName, label: Artist name, widget: string }
+          - { name: tagline, label: Tagline (home page), widget: string, required: false }
+          - { name: homeIntro, label: Short introduction (home page), widget: text, required: false }
+          - { name: location, label: Location, widget: string, required: false }
+          - { name: email, label: Email, widget: string, required: false }
+          - { name: phone, label: Phone, widget: string, required: false }
+          - { name: instagram, label: Instagram link, widget: string, required: false, hint: "Full address, e.g. https://www.instagram.com/…" }
+          - { name: facebook, label: Facebook link, widget: string, required: false }
+          - { name: contactIntro, label: Contact page text, widget: text, required: false }
+          - { name: siteDescription, label: Description for search engines, widget: text, required: false }

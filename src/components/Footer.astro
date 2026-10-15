@@ -1,0 +1,66 @@
+---
+import { settings, socialLinks } from '../lib/settings';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer container">
+  <p>Copyright © {year} {settings.artistName}</p>
+  <ul>
+    {settings.email && <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>}
+    {
+      socialLinks.map((s) => (
+        <li>
+          <a href={s.href} target="_blank" rel="noopener">
+            {s.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 32px;
+    margin-top: 96px;
+    padding-top: 28px;
+    padding-bottom: 40px;
+    font-size: 13px;
+    color: var(--muted);
+    position: relative;
+  }
+
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    top: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+</style>

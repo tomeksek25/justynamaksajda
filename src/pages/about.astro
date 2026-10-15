@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { settings } from '../lib/settings';
+
+const page = await getEntry('pages', 'about');
+if (!page) throw new Error('Missing src/content/pages/about.md');
+const { Content } = await render(page);
+const { title, portrait, portraitCaption } = page.data;
+---
+
+<Base title={title}>
+  <div class="container section">
+    <h1 class="page-title">{title}</h1>
+    <div class={portrait ? 'layout' : undefined}>
+      {
+        portrait && (
+          <figure class="portrait">
+            <Image src={portrait} alt={portraitCaption || settings.artistName} widths={[400, 800]} sizes="(min-width: 900px) 30vw, 92vw" />
+            {portraitCaption && <figcaption>{portraitCaption}</figcaption>}
+          </figure>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+
+  .portrait {
+    margin: 0;
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

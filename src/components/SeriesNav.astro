@@ -1,0 +1,66 @@
+---
+import { SERIES } from '../data/series';
+
+interface Props {
+  current?: string;
+  available: string[];
+}
+
+const { current, available } = Astro.props;
+const items = [
+  { href: '/works/', label: 'All works', active: !current },
+  ...SERIES.filter((s) => available.includes(s.id)).map((s) => ({
+    href: `/series/${s.id}/`,
+    label: s.label,
+    active: current === s.id,
+  })),
+];
+---
+
+<nav class="series-nav" aria-label="Series">
+  <ul>
+    {
+      items.map((item) => (
+        <li>
+          <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .series-nav {
+    margin: 0 0 48px;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--muted);
+    padding: 6px 0;
+    border-bottom: 1px solid transparent;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+
+  a[aria-current='page'] {
+    color: var(--text);
+    border-bottom-color: var(--text);
+  }
+</style>

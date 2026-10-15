@@ -1,0 +1,59 @@
+---
+import '@fontsource/lato/300.css';
+import '@fontsource/lato/300-italic.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/400-italic.css';
+import '@fontsource/lato/700.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { settings } from '../lib/settings';
+import { canEnquire, getWorks } from '../lib/works';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  /** Pages like the 404 should not declare a canonical URL. */
+  canonical?: boolean;
+  noindex?: boolean;
+}
+
+const { title, description = settings.siteDescription, image, canonical: withCanonical = true, noindex = false } =
+  Astro.props;
+// Works that can currently be enquired about; the enquiry list ignores anything else.
+const enquirable = (await getWorks()).filter(canEnquire).map((w) => w.id);
+const fullTitle = title ? `${title} | ${settings.artistName}` : `${settings.artistName} – Paintings`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {withCanonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {withCanonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+  </head>
+  <body data-enquirable={JSON.stringify(enquirable)}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/enquiry';
+    </script>
+  </body>
+</html>

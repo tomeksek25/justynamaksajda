@@ -1,0 +1,25 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  variant?: 'link' | 'button';
+}
+
+const { slug, title, variant = 'link' } = Astro.props;
+const labelOff = variant === 'button' ? 'Add to enquiry list' : 'Add to enquiry';
+const labelOn = variant === 'button' ? 'In your enquiry list' : 'In enquiry';
+---
+
+<button
+  type="button"
+  class={variant === 'button' ? 'btn btn--ghost' : 'link-button'}
+  data-enquiry-toggle
+  data-slug={slug}
+  data-label-off={labelOff}
+  data-label-on={labelOn}
+  aria-pressed="false"
+>
+  {variant === 'link' && <span class="icon" aria-hidden="true"></span>}
+  <span data-label aria-hidden="true">{labelOff}</span>
+  <span class="visually-hidden">Enquiry list: {title}</span>
+</button>
