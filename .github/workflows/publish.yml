@@ -1,0 +1,24 @@
+# "Publish Changes" in the admin panel sends this event; it starts a Netlify build of the saved content.
+# Admin saves are marked [skip ci], so Netlify doesn't build them on its own (see public/admin/config.yml).
+# Needs the repository secret NETLIFY_BUILD_HOOK: the URL of a Netlify build hook for the main branch.
+name: Publish site
+
+on:
+  repository_dispatch:
+    types: [sveltia-cms-publish]
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start a Netlify build
+        env:
+          HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::The NETLIFY_BUILD_HOOK secret is not set (repository Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          curl --fail --silent --show-error -X POST -d '{}' "$HOOK"

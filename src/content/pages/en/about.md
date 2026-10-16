@@ -1,67 +1,67 @@
 ---
-title: O mnie
+title: About
 portrait: ''
 portraitCaption: ''
 ---
 
-Twórczość w zakresie malarstwa, rysunku i grafiki artystycznej.
+Painting, drawing and printmaking.
 
-Dyplom z wyróżnieniem na Akademii Sztuk Pięknych im. Władysława Strzemińskiego w Łodzi w 2018 roku (wystawa najlepszych dyplomów ASP PRIME TIME 2018). Stypendium w ESAD Grenoble (Francja) 2016–2017. 
+Graduated with distinction from the Władysław Strzemiński Academy of Fine Arts in Łódź in 2018 (her diploma was shown at PRIME TIME 2018, the exhibition of the Academy's best diplomas). Scholarship at ESAD Grenoble, France, in 2016–2017.
 
-Laureatka GRAND PRIX w 35. edycji konkursu im. Władysława Strzemińskiego (2018); nagrody i wyróżnienia w konkursach Hommage à Kobro (2016), Hommage à l'Avant-garde (2017) i 28. Ogólnopolskim Przeglądzie Malarstwa Młodych w Legnicy (2018) Uczestniczka rezydencji artystycznej Audankunststiftung w Lehniner Instytut für Kunst und Kultur w 2020 roku.
+Winner of the GRAND PRIX of the 35th Władysław Strzemiński Competition (2018); awards and distinctions in the Hommage à Kobro (2016) and Hommage à l'Avant-garde (2017) competitions and at the 28th National Review of Young Painting in Legnica (2018). Artist in residence of the Audankunststiftung at the Lehniner Institut für Kunst und Kultur in 2020.
 
-## Wybrane wystawy
+## Selected exhibitions
 
 **2024**
 
-- Wewnętrzna konieczność, wystawa zbiorowa w ramach Lodz Abstract Art Festival, Galeria S35, Łódź 
+- _Wewnętrzna konieczność_ (Inner Necessity), group exhibition, Lodz Abstract Art Festival, S35 Gallery, Łódź
 
 **2022**
 
-- _7. Ogólnopolski Konkurs dla Młodych Artystów im. Mariana Michalika,_ nagroda Starosty Częstochowskiego za cykl prac teraz/chwila obecna, Częstochowa 
+- _7th Marian Michalik National Competition for Young Artists_, Częstochowa County Governor's Prize for the series _teraz/chwila obecna_ (now/the present moment), Częstochowa
 
 **2021**
 
-- _Friendship_, wystawa zbiorowa, Galeria Pula/Galeria Pet Kula Motovun, Chorwacja
+- _Friendship_, group exhibition, Pula Gallery / Pet Kula Gallery, Motovun, Croatia
 
 **2020**
 
-- _chwila obecna – teraz_, wystawa indywidualna, Lehniner Instytut für Kunst im Kultur, Lehnin, Niemcy
-- _Bezruch_, wystawa indywidualna, Galeria Krupa, Wrocław
-- _Dobra forma_, wystawa absolwentów Akademii Sztuk Pięknych w Łodzi, BWA Sieradz
+- _chwila obecna – teraz_ (the present moment – now), solo exhibition, Lehniner Institut für Kunst und Kultur, Lehnin, Germany
+- _Bezruch_ (Stillness), solo exhibition, Krupa Gallery, Wrocław
+- _Dobra forma_ (Good Form), exhibition of graduates of the Academy of Fine Arts in Łódź, BWA Sieradz
 
 **2019**
 
-- _XI Triennale Małych Form Malarskich_, wystawa pokonkursowa, Toruń
-- _Powroty_, wystawa malarstwa, Barlickiego 30, Tomaszów Mazowiecki
-- _Pierwszy kamień_, wystawa zbiorowa, Galeria BRUKOWA, Łódź
-- _PRIME TIME_, wystawa najlepszych dyplomów, Akademia Sztuk Pięknych, Łódź
+- _11th Triennial of Small Painting Forms_, post-competition exhibition, Toruń
+- _Powroty_ (Returns), painting exhibition, Barlickiego 30, Tomaszów Mazowiecki
+- _Pierwszy kamień_ (First Stone), group exhibition, BRUKOWA Gallery, Łódź
+- _PRIME TIME_, exhibition of the best diplomas, Academy of Fine Arts, Łódź
 
 **2018**
 
-- _28. Ogólnopolski Przegląd Malarstwa Młodych „PROMOCJE 2018”_, wyróżnienie honorowe Dyrektora Galerii Sztuki w Legnicy, Galeria Sztuki w Legnicy
-- _Wystawa Pracowni Drzeworytu i Książki Artystycznej_, Muzeum Książki Artystycznej, Łódź
-- _35. Konkurs im. Władysława Strzemińskiego_, wystawa pokonkursowa, **GRAND PRIX**, Ośrodek Propagandy Sztuki, Łódź
+- _28th National Review of Young Painting "PROMOCJE 2018"_, Honourable Mention of the Director of the Legnica Art Gallery, Legnica Art Gallery
+- _Exhibition of the Woodcut and Artist's Book Studio_, Book Art Museum, Łódź
+- _35th Władysław Strzemiński Competition_, post-competition exhibition, **GRAND PRIX**, Ośrodek Propagandy Sztuki, Łódź
 
 **2017**
 
-- _Hommage à l'Avant-garde_, wystawa pokonkursowa, III nagroda, Akademia Sztuk Pięknych, Łódź
-- _Między halo a mandalą_, Poleski Ośrodek Sztuki, Łódź
-- _Graphics Open 2_ – Międzynarodowe Biennale Grafiki Studenckiej, Węgierski Uniwersytet Sztuk Pięknych, Budapeszt
-- _Mała forma graficzna_, wystawa pokonkursowa, Galeria Amcor, Łódź
+- _Hommage à l'Avant-garde_, post-competition exhibition, 3rd prize, Academy of Fine Arts, Łódź
+- _Między halo a mandalą_ (Between Halo and Mandala), Poleski Ośrodek Sztuki, Łódź
+- _Graphics Open 2_ – International Biennial of Student Printmaking, Hungarian University of Fine Arts, Budapest
+- _Mała forma graficzna_ (Small Graphic Form), post-competition exhibition, Amcor Gallery, Łódź
 
 **2016**
 
-- Wystawa indywidualna, LOKAL, Łódź
-- Malarstwo w przestrzeni publicznej, Galeria BOAT, Łódź
-- _Eksperymentarium i goście_, przegląd grafiki studenckiej, Galeria ASP Piotrkowska 68, Łódź
-- _Chartów_, wystawa poplenerowa, Galeria ASP Nasza Ściana, Łódź
-- _Hommage à Kobro_, wystawa pokonkursowa, wyróżnienie jury za pracę _Podział płaszczyzny_, CPM ASP, Łódź
-- Wystawa Katedry Rysunku, Festiwal Nauki, Techniki i Sztuki, Łódź
+- Solo exhibition, LOKAL, Łódź
+- Painting in public space, BOAT Gallery, Łódź
+- _Eksperymentarium i goście_ (Experimentarium and Guests), review of student printmaking, ASP Gallery Piotrkowska 68, Łódź
+- _Chartów_, post-plein-air exhibition, ASP Gallery Nasza Ściana, Łódź
+- _Hommage à Kobro_, post-competition exhibition, Jury Distinction for _Podział płaszczyzny_ (Division of the Plane), CPM ASP, Łódź
+- Drawing Department exhibition, Łódź Festival of Science, Technology and Art, Łódź
 
 **2013–2015**
 
-- _Bolestraszyce_, wystawa poplenerowa, Galeria ASP Nasza Ściana, Łódź (2015)
-- _Na tych samych sztalugach_, wystawa pracowni 210, Galeria „Pod napięciem”, Politechnika Łódzka (2014)
-- _My Colouring… wall_, mural inspirowany twórczością Pauline Boty i pop-artem, Muzeum Sztuki ms2, Łódź (2014)
-- Wystawa indywidualna, Dwóch Takich, Krakowskie Przedmieście 11, Warszawa (2013)
+- _Bolestraszyce_, post-plein-air exhibition, ASP Gallery Nasza Ściana, Łódź (2015)
+- _Na tych samych sztalugach_ (On the Same Easels), studio 210 exhibition, "Pod napięciem" Gallery, Łódź University of Technology (2014)
+- _My Colouring… wall_, mural inspired by Pauline Boty and pop art, Muzeum Sztuki ms2, Łódź (2014)
+- Solo exhibition, Dwóch Takich, Krakowskie Przedmieście 11, Warsaw (2013)

@@ -7,7 +7,7 @@ A static portfolio site built with [Astro](https://astro.build), with an admin p
 - **Enquiries.** Visitors can ask about one work ("Enquire about this work"), or collect several works in an *enquiry list* and send one message about all of them. The contact form sends Justyna an email that lists the selected works with their links.
 - **Admin panel** at `/admin/` for uploading photos, editing works in Polish and English side by side, managing categories, choosing the home page slideshow, and editing the About page and contact details. No code needed.
 
-All content lives in this repository. Each save in the admin panel is a Git commit, and Netlify rebuilds the site after every commit (about 1–2 minutes).
+All content lives in this repository. Each save in the admin panel is a Git commit. Netlify's free plan allows about 20 site updates (deploys) a month, so admin saves are marked `[skip ci]` and Netlify doesn't build them. **Publish Changes** in the admin panel starts one build with everything saved so far: it sends an event to GitHub, and `.github/workflows/publish.yml` calls a Netlify build hook. Deletions in the admin panel and commits pushed from a computer aren't marked, so they're published straight away (about 1–2 minutes).
 
 ```
 src/content/works/*.md             one file per work; Polish at the top level, English under `en:`
@@ -44,8 +44,12 @@ To try the admin panel locally, open http://localhost:4321/admin/index.html in C
    - Copy the *Client ID* and generate a *Client secret*.
    - On Netlify, go to *Project configuration → Access & security → OAuth → Install provider → GitHub*. Paste the ID and the secret.
 5. **Justyna's account.** Justyna needs a free GitHub account. Add her to the repository (*Settings → Collaborators*) with write access.
-6. **Contact form.** On Netlify, go to *Forms* and enable form detection, then redeploy. Under *Forms → Form notifications*, add an email notification for the `enquiry` form to `justyna.joanna.maksajda@gmail.com`. Spam is filtered by a honeypot field and Netlify's built-in filter.
-7. **Domain (optional).** Under *Domain management*, add a custom domain such as `justynamaksajda.com`. The site uses Netlify's `URL` automatically. To set it yourself, set a `SITE_URL` environment variable.
+6. **Publishing from the admin panel (one-time).**
+   - On Netlify, go to *Project configuration → Build & deploy → Build hooks → Add build hook*. Name it e.g. "Admin publish", choose the `main` branch, and copy the URL.
+   - On GitHub, go to the repository's *Settings → Secrets and variables → Actions → New repository secret*. Name it `NETLIFY_BUILD_HOOK` and paste the URL.
+   - Test it: save something in the admin panel, click **Publish Changes**, and check the repository's *Actions* tab and Netlify's *Deploys*.
+7. **Contact form.** On Netlify, go to *Forms* and enable form detection, then redeploy. Under *Forms → Form notifications*, add an email notification for the `enquiry` form to `justyna.joanna.maksajda@gmail.com`. Spam is filtered by a honeypot field and Netlify's built-in filter.
+8. **Domain (optional).** Under *Domain management*, add a custom domain such as `justynamaksajda.com`. The site uses Netlify's `URL` automatically. To set it yourself, set a `SITE_URL` environment variable.
 
 ## How Justyna edits the site
 
@@ -58,11 +62,12 @@ To try the admin panel locally, open http://localhost:4321/admin/index.html in C
    - **Price.** Optional. It only appears if you fill it in.
    - **Order within the year.** Works are sorted newest year first. Within the same year, lower numbers come first.
    - **Hide from the website.** Keeps a work in the admin panel but takes it off the site.
-3. Click **Save**. The site updates in about 1–2 minutes.
-4. **Categories** lists the filters above the gallery (e.g. *Large formats*). Add, rename or describe a category here, and use **Reorder** to change their order on the site. Each category has a **web address** (e.g. `rysunki` → `/series/rysunki/`), set when you create it. Renaming a category keeps its works and its address; changing the address breaks old links to it.
-5. **Pages → Home page** picks the works in the home page slideshow. Add works and drag them into the order you want. It also holds the short text under the slideshow.
-6. **Pages → About** edits the biography and exhibitions in both languages. You can also add a portrait photo there.
-7. **Settings → Site details & contact** changes the email, phone, Instagram link and the contact page text.
+3. Click **Save** (*Zapisz* in a Polish browser). Saving doesn't change the website yet, so save as often as you like. (The arrow next to Save also offers *Save and Publish* / *Zapisz i opublikuj*, which publishes at once; there's rarely a reason to use it.)
+4. When you've finished a batch of changes, click **Publish Changes** (*Opublikuj zmiany*) at the top of the admin panel. The site updates in about 1–2 minutes. The free plan allows about 20 updates a month, so publish once at the end of an editing session rather than after every save. Deleting a work, category or image publishes straight away, together with everything saved before it. If the site hasn't changed after a few minutes, check *Deploys* on Netlify: the button only reports that the update was requested, not that it finished.
+5. **Categories** lists the filters above the gallery (e.g. *Large formats*). Add, rename or describe a category here, and use **Reorder** to change their order on the site. Each category has a **web address** (e.g. `rysunki` → `/series/rysunki/`), set when you create it. Renaming a category keeps its works and its address; changing the address breaks old links to it.
+6. **Pages → Home page** picks the works in the home page slideshow. Add works and drag them into the order you want. It also holds the short text under the slideshow.
+7. **Pages → About** edits the biography and exhibitions in both languages. You can also add a portrait photo there.
+8. **Settings → Site details & contact** changes the email, phone, Instagram link and the contact page text.
 
 The works imported from the old Wix site have placeholder titles (*Szkic nr 12* / *Sketch no. 12*, …). Rename them in the admin panel. The web address of a work stays the same when you rename it.
 

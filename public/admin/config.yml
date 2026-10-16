@@ -1,10 +1,14 @@
 # Sveltia CMS configuration – https://sveltiacms.app/en/docs
-# The admin panel lives at /admin/. Every save is a Git commit; Netlify rebuilds the site in ~1–2 minutes.
+# The admin panel lives at /admin/. Every save is a Git commit; "Publish Changes" rebuilds the site (see skip_ci below).
 
 backend:
   name: github
   repo: tomeksek25/justynamaksajda
   branch: main
+  # Netlify's free plan allows about 20 site updates a month, so saving doesn't publish: saves get a
+  # "[skip ci]" tag that Netlify skips (deletions don't, so they publish at once). "Publish Changes" in
+  # the admin toolbar publishes everything saved so far, through .github/workflows/publish.yml.
+  skip_ci: true
   commit_messages:
     create: 'Add {{collection}} “{{slug}}”'
     update: 'Update {{collection}} “{{slug}}”'

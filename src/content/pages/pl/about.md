@@ -8,17 +8,17 @@ Twórczość w zakresie malarstwa, rysunku i grafiki artystycznej.
 
 Dyplom z wyróżnieniem na Akademii Sztuk Pięknych im. Władysława Strzemińskiego w Łodzi w 2018 roku (wystawa najlepszych dyplomów ASP PRIME TIME 2018). Stypendium w ESAD Grenoble (Francja) 2016–2017. 
 
-Laureatka GRAND PRIX w 35. edycji konkursu im. Władysława Strzemińskiego (2018); nagrody i wyróżnienia w konkursach Hommage à Kobro (2016), Hommage à l'Avant-garde (2017) i 28. Ogólnopolskim Przeglądzie Malarstwa Młodych w Legnicy (2018) Uczestniczka rezydencji artystycznej Audankunststiftung w Lehniner Instytut für Kunst und Kultur w 2020 roku.
+Laureatka GRAND PRIX w 35. edycji konkursu im. Władysława Strzemińskiego (2018); nagrody i wyróżnienia w konkursach Hommage à Kobro (2016), Hommage à l'Avant-garde (2017) i 28. Ogólnopolskim Przeglądzie Malarstwa Młodych w Legnicy (2018). Uczestniczka rezydencji artystycznej Audankunststiftung w Lehniner Institut für Kunst und Kultur w 2020 roku.
 
 ## Wybrane wystawy
 
 **2024**
 
-- Wewnętrzna konieczność, wystawa zbiorowa w ramach Lodz Abstract Art Festival, Galeria S35, Łódź 
+- _Wewnętrzna konieczność_, wystawa zbiorowa w ramach Lodz Abstract Art Festival, Galeria S35, Łódź 
 
 **2022**
 
-- _7. Ogólnopolski Konkurs dla Młodych Artystów im. Mariana Michalika,_ nagroda Starosty Częstochowskiego za cykl prac teraz/chwila obecna, Częstochowa 
+- _7. Ogólnopolski Konkurs dla Młodych Artystów im. Mariana Michalika_, nagroda Starosty Częstochowskiego za cykl prac _teraz/chwila obecna_, Częstochowa 
 
 **2021**
 
@@ -26,7 +26,7 @@ Laureatka GRAND PRIX w 35. edycji konkursu im. Władysława Strzemińskiego (201
 
 **2020**
 
-- _chwila obecna – teraz_, wystawa indywidualna, Lehniner Instytut für Kunst im Kultur, Lehnin, Niemcy
+- _chwila obecna – teraz_, wystawa indywidualna, Lehniner Institut für Kunst und Kultur, Lehnin, Niemcy
 - _Bezruch_, wystawa indywidualna, Galeria Krupa, Wrocław
 - _Dobra forma_, wystawa absolwentów Akademii Sztuk Pięknych w Łodzi, BWA Sieradz
 
