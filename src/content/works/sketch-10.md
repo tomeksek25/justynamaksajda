@@ -8,7 +8,7 @@ series: painting-sketches
 year: 2018–2019
 medium: Akryl i olej na płycie
 dimensions: 19 × 19 cm
-availability: available
+availability: ''
 price: ''
 imageAlt: ''
 order: 100
