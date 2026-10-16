@@ -1,14 +1,23 @@
 ---
-title: "Szkic nr 11"
-year: "2018–2019"
-series: painting-sketches
-medium: "Akryl i olej na płycie"
-dimensions: "19 × 19 cm"
+lang:
+  - pl
+  - en
+title: Szkic nr 11
 image: ../../assets/works/sketch-11.jpg
-availability: ""
-price: ""
+series: painting-sketches
+year: 2018–2019
+medium: Akryl i olej na płycie
+dimensions: 19 × 19 cm
+availability: nfs
+price: ''
+imageAlt: ''
 order: 110
+draft: false
 en:
-  title: "Sketch no. 11"
-  medium: "Acrylic and oil on board"
+  title: Sketch no. 11
+  medium: Acrylic and oil on board
+  body: This is a default description.
+  imageAlt: ''
 ---
+
+To jest domyślny opis.
