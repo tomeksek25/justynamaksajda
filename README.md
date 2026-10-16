@@ -49,6 +49,12 @@ To try the admin panel locally, open http://localhost:4321/admin/index.html in C
    - On GitHub, go to the repository's *Settings → Secrets and variables → Actions → New repository secret*. Name it `NETLIFY_BUILD_HOOK` and paste the URL.
    - Test it: save something in the admin panel, click **Publish Changes**, and check the repository's *Actions* tab and Netlify's *Deploys*.
 7. **Contact form.** On Netlify, go to *Forms* and enable form detection, then redeploy. Under *Forms → Form notifications*, add an email notification for the `enquiry` form to `justyna.joanna.maksajda@gmail.com`. Spam is filtered by a honeypot field and Netlify's built-in filter.
+   - **Email with thumbnails (Resend).** `netlify/functions/submission-created.mjs` emails each accepted enquiry to Justyna through [Resend](https://resend.com), with thumbnails of the selected works; the email itself is built by `src/server/enquiry-email.mjs`. Resend's free plan (3,000 emails a month, 100 a day) has no overage charges: at the limit, sending just pauses.
+     1. Create a free account at resend.com. No card is needed; if it asks for one, stop.
+     2. *Domains → Add domain* → `justynamaksajda.com`. Add the DNS records it shows in Netlify (*Domains → justynamaksajda.com → DNS settings → Add new record*) and wait until Resend shows the domain as verified.
+     3. *API Keys → Create API key* with *Sending access* for that domain only.
+     4. On Netlify, *Project configuration → Environment variables*, add `RESEND_API_KEY` (the key), `ENQUIRY_TO` (`justyna.joanna.maksajda@gmail.com`) and `ENQUIRY_FROM` (`Strona – Justyna Maksajda <formularz@justynamaksajda.com>`).
+     5. Publish and send a test enquiry. Keep Netlify's own form notification as a backup in case an email can't be sent (e.g. the daily limit is reached), but send it to your own address instead of Justyna's so she doesn't get every enquiry twice. Netlify also keeps every submission under *Forms*, and failed sends are logged under *Logs → Functions*.
 8. **Domain (optional).** Under *Domain management*, add a custom domain such as `justynamaksajda.com`. The site uses Netlify's `URL` automatically. To set it yourself, set a `SITE_URL` environment variable.
 
 ## How Justyna edits the site

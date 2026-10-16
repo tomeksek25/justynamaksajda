@@ -66,6 +66,8 @@ const index = Object.fromEntries(
           <input type="hidden" name="subject" value={t('contact.subject')} data-remove-prefix data-subject />
           <input type="hidden" name="language" value={locale} />
           <input type="hidden" name="works" value="" data-works-field />
+          <!-- Ids of the works in the enquiry, for the email with thumbnails (netlify/functions/submission-created.mjs). -->
+          <input type="hidden" name="work-ids" value="" data-work-ids-field />
           <p class="visually-hidden" aria-hidden="true">
             <label>{t('contact.honeypot')} <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
           </p>
@@ -143,6 +145,7 @@ const index = Object.fromEntries(
   const panel = document.querySelector<HTMLElement>('[data-enquiry-panel]');
   const list = document.querySelector<HTMLUListElement>('[data-enquiry-items]');
   const worksField = document.querySelector<HTMLInputElement>('[data-works-field]');
+  const workIdsField = document.querySelector<HTMLInputElement>('[data-work-ids-field]');
   const subjectField = document.querySelector<HTMLInputElement>('[data-subject]');
 
   function item(slug: string, work: Entry) {
@@ -194,6 +197,7 @@ const index = Object.fromEntries(
         })
         .join('\n');
     }
+    if (workIdsField) workIdsField.value = slugs.join(',');
     if (subjectField) {
       const titles = slugs.map((slug) => index[slug].title);
       subjectField.value = titles.length ? format(labels.labelSubjectWorks ?? '', { titles: titles.join(', ') }) : (labels.labelSubject ?? '');
