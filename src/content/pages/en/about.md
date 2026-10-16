@@ -1,6 +1,7 @@
 ---
 title: About
-portraitCaption: ""
+portrait: ''
+portraitCaption: ''
 ---
 
 Justyna Maksajda graduated with distinction from the Władysław Strzemiński Academy of Fine Arts in Łódź in 2018 (her diploma was shown at PRIME TIME 2018, the exhibition of the Academy's best diplomas). She held a scholarship at ESAD Grenoble, France, in 2016–2017, and is also a graduate of the WSA in Warsaw.
