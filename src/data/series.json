@@ -18,5 +18,19 @@
       "title": "Painting sketches",
       "description": ""
     }
+  },
+  {
+    "lang": [
+      "pl",
+      "en"
+    ],
+    "title": "Kompozycja",
+    "id": "0fed5fbba3c4",
+    "slug": "kompozycja",
+    "description": "",
+    "en": {
+      "title": "",
+      "description": ""
+    }
   }
 ]
