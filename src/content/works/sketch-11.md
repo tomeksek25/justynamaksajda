@@ -4,7 +4,7 @@ lang:
   - en
 title: Szkic nr 11
 image: ../../assets/works/sketch-11.jpg
-series: 0fed5fbba3c4
+series: painting-sketches
 year: 2018–2019
 medium: Akryl i olej na płycie
 dimensions: 19 × 19 cm
