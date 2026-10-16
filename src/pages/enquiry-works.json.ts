@@ -3,7 +3,7 @@ import { getImage } from 'astro:assets';
 import { DEFAULT_LOCALE } from '../lib/i18n';
 import { canEnquire, getWorks, workText, workUrl } from '../lib/works';
 
-// Works index for the enquiry email (netlify/functions/submission-created.mjs): Polish titles, page links
+// Works index for the enquiry email (functions/api/enquiry.js): Polish titles, page links
 // and small JPEG thumbnails, which email programs show more reliably than WebP. Sold and not-for-sale works
 // can't be added to an enquiry, so they're left out.
 export const GET: APIRoute = async ({ site }) => {

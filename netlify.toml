@@ -1,19 +1,22 @@
+# The site is hosted on Cloudflare Pages (see README). Netlify only keeps the domain and its DNS, and forwards the
+# bare domain (justynamaksajda.com) and the old netlify.app address to www.justynamaksajda.com. Each Netlify
+# deploy costs credits however small it is, so builds stay stopped, and even when they're on, Netlify skips
+# every commit that doesn't change this file.
 [build]
-  command = "npm run build"
-  publish = "dist"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- netlify.toml"
+  command = "mkdir -p netlify-forward && echo 'Moved to https://www.justynamaksajda.com/' > netlify-forward/index.html"
+  publish = "netlify-forward"
 
-[build.environment]
-  NODE_VERSION = "22"
-
-[[headers]]
-  for = "/_astro/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Netlify uses the first matching rule (public/_redirects comes before these), and this one matches every missing
-# /en/ page, so keep it last.
-# Missing English pages get the English "page not found" page; everything else gets /404.html.
+# Only these two addresses are forwarded. www must never be handled here (it would redirect to itself), so it
+# must not be one of the Netlify project's domains either.
 [[redirects]]
-  from = "/en/*"
-  to = "/en/404/"
-  status = 404
+  from = "https://justynamaksajda.com/*"
+  to = "https://www.justynamaksajda.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://justynamaksajda.netlify.app/*"
+  to = "https://www.justynamaksajda.com/:splat"
+  status = 301
+  force = true

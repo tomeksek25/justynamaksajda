@@ -5,3 +5,7 @@ dist/
 .idea/
 .env
 *.iml
+netlify-forward/
+.wrangler/
+# Local secrets for `wrangler pages dev`
+.dev.vars

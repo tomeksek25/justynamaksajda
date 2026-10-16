@@ -1,13 +1,13 @@
 # Justyna Maksajda – portfolio site
 
-A static portfolio site built with [Astro](https://astro.build), with an admin panel built on [Sveltia CMS](https://sveltiacms.app). It's designed to be hosted for free on [Netlify](https://www.netlify.com).
+A static portfolio site built with [Astro](https://astro.build), with an admin panel built on [Sveltia CMS](https://sveltiacms.app). It's hosted for free on [Cloudflare Pages](https://pages.cloudflare.com).
 
 - **Bilingual.** Polish pages live at the root (`/works/…`), English ones under `/en/` (`/en/works/…`). A PL / EN switch in the header links to the same page in the other language.
 - **Works gallery** with category filters, and a page for each work (with a zoomable image and previous/next links).
-- **Enquiries.** Visitors can ask about one work ("Enquire about this work"), or collect several works in an *enquiry list* and send one message about all of them. The contact form sends Justyna an email that lists the selected works with their links.
+- **Enquiries.** Visitors can ask about one work ("Enquire about this work"), or collect several works in an *enquiry list* and send one message about all of them. The contact form sends Justyna an email that shows the selected works with thumbnails and links.
 - **Admin panel** at `/admin/` for uploading photos, editing works in Polish and English side by side, managing categories, choosing the home page slideshow, and editing the About page and contact details. No code needed.
 
-All content lives in this repository. Each save in the admin panel is a Git commit. Netlify's free plan allows about 20 site updates (deploys) a month, so admin saves are marked `[skip ci]` and Netlify doesn't build them. **Publish Changes** in the admin panel starts one build with everything saved so far: it sends an event to GitHub, and `.github/workflows/publish.yml` calls a Netlify build hook. Deletions in the admin panel and commits pushed from a computer aren't marked, so they're published straight away (about 1–2 minutes).
+All content lives in this repository. Each save in the admin panel is a Git commit, and Cloudflare Pages rebuilds the site after every commit (about 1–2 minutes; the free plan allows 500 builds a month).
 
 ```
 src/content/works/*.md             one file per work; Polish at the top level, English under `en:`
@@ -18,6 +18,9 @@ src/data/home.json                 home page slideshow and intro text
 src/data/settings.json             name, email, social links, contact text
 src/lib/i18n.ts                    languages and the site's fixed texts (menu, buttons, form labels)
 public/admin/config.yml            admin panel configuration
+functions/api/enquiry.js           contact form: bot check, then the email to Justyna (Cloudflare Pages Function)
+src/server/enquiry-email.mjs       the enquiry email itself (works with thumbnails, message)
+netlify.toml                       Netlify now only forwards justynamaksajda.com to www (see below)
 ```
 
 ## Local development
@@ -30,32 +33,49 @@ npm run dev        # http://localhost:4321
 npm run build      # production build into dist/
 ```
 
+The contact form is a Cloudflare Pages Function, which `npm run dev` doesn't run (sending it there shows an error). To test it, build and run the site with Cloudflare's local server, with the settings in a `.dev.vars` file (never committed; see the variables below):
+
+```sh
+npm run build
+npx wrangler pages dev dist      # http://localhost:8788
+```
+
+```
+# .dev.vars – for local testing only
+ALLOW_NO_TURNSTILE=true
+RESEND_API_KEY=...
+ENQUIRY_TO=you@example.com
+ENQUIRY_FROM=Test <formularz@justynamaksajda.com>
+```
+
 To try the admin panel locally, open http://localhost:4321/admin/index.html in Chrome or Edge. Click **Work with Local Repository** and select this project folder. Your changes are written straight to your local files.
 
 ## Deployment (one-time setup)
 
-1. **GitHub.** Create a repository (it can be private) and push this project to it.
-2. **Admin config.** `backend.repo` in `public/admin/config.yml` is set to `tomeksek25/justynamaksajda`. Change it if the repository moves.
-3. **Netlify.** Click *Add new project → Import an existing project → GitHub* and pick the repository. The build settings come from `netlify.toml`, so you don't need to change anything.
-4. **Admin login (GitHub OAuth).**
-   - On GitHub, go to *Settings → Developer settings → OAuth Apps → New OAuth App*.
-     - Homepage URL: your site URL, e.g. `https://justynamaksajda.netlify.app`
-     - Authorization callback URL: `https://api.netlify.com/auth/done`
-   - Copy the *Client ID* and generate a *Client secret*.
-   - On Netlify, go to *Project configuration → Access & security → OAuth → Install provider → GitHub*. Paste the ID and the secret.
-5. **Justyna's account.** Justyna needs a free GitHub account. Add her to the repository (*Settings → Collaborators*) with write access.
-6. **Publishing from the admin panel (one-time).**
-   - On Netlify, go to *Project configuration → Build & deploy → Build hooks → Add build hook*. Name it e.g. "Admin publish", choose the `main` branch, and copy the URL.
-   - On GitHub, go to the repository's *Settings → Secrets and variables → Actions → New repository secret*. Name it `NETLIFY_BUILD_HOOK` and paste the URL.
-   - Test it: save something in the admin panel, click **Publish Changes**, and check the repository's *Actions* tab and Netlify's *Deploys*.
-7. **Contact form.** On Netlify, go to *Forms* and enable form detection, then redeploy. Under *Forms → Form notifications*, add an email notification for the `enquiry` form to `justyna.joanna.maksajda@gmail.com`. Spam is filtered by a honeypot field and Netlify's built-in filter.
-   - **Email with thumbnails (Resend).** `netlify/functions/submission-created.mjs` emails each accepted enquiry to Justyna through [Resend](https://resend.com), with thumbnails of the selected works; the email itself is built by `src/server/enquiry-email.mjs`. Resend's free plan (3,000 emails a month, 100 a day) has no overage charges: at the limit, sending just pauses.
-     1. Create a free account at resend.com. No card is needed; if it asks for one, stop.
-     2. *Domains → Add domain* → `justynamaksajda.com`. Add the DNS records it shows in Netlify (*Domains → justynamaksajda.com → DNS settings → Add new record*) and wait until Resend shows the domain as verified.
-     3. *API Keys → Create API key* with *Sending access* for that domain only.
-     4. On Netlify, *Project configuration → Environment variables*, add `RESEND_API_KEY` (the key), `ENQUIRY_TO` (`justyna.joanna.maksajda@gmail.com`) and `ENQUIRY_FROM` (`Strona – Justyna Maksajda <formularz@justynamaksajda.com>`).
-     5. Publish and send a test enquiry. Keep Netlify's own form notification as a backup in case an email can't be sent (e.g. the daily limit is reached), but send it to your own address instead of Justyna's so she doesn't get every enquiry twice. Netlify also keeps every submission under *Forms*, and failed sends are logged under *Logs → Functions*.
-8. **Domain (optional).** Under *Domain management*, add a custom domain such as `justynamaksajda.com`. The site uses Netlify's `URL` automatically. To set it yourself, set a `SITE_URL` environment variable.
+The site runs on **Cloudflare Pages** at `www.justynamaksajda.com`. The domain is registered at Netlify and its DNS is there too, so Netlify only forwards the bare `justynamaksajda.com` (and the old `justynamaksajda.netlify.app`) to `www`, with `netlify.toml`. Builds are stopped on Netlify; they're only switched on to change that forwarding.
+
+1. **GitHub.** The repository is `tomeksek25/justynamaksajda` (`backend.repo` in `public/admin/config.yml`). Justyna needs a free GitHub account with write access (*Settings → Collaborators*).
+2. **Cloudflare Pages.** *Workers & Pages → Create → Pages → Import an existing Git repository*, pick the repository. Production branch `main`, framework preset *Astro*, build command `npm run build`, output directory `dist`.
+3. **Resend (email).** Create a free account at [resend.com](https://resend.com) (no card needed; the free plan, 3,000 emails a month and 100 a day, has no overage charges: at the limit, sending just pauses). *Domains → Add domain* → `justynamaksajda.com`, region EU. Add the DNS records it shows in Netlify (*Domains → justynamaksajda.com → DNS settings*). Then *API Keys → Create API key* with *Sending access* for that domain.
+4. **Turnstile (bot check).** In Cloudflare, *Turnstile → Add widget*, mode *Managed*, hostnames `www.justynamaksajda.com` and `justynamaksajda.pages.dev`. It gives a site key and a secret key.
+5. **Cloudflare Pages variables** (*Settings → Variables and Secrets*, Production):
+   - `NODE_VERSION` = `22`
+   - `SITE_URL` = `https://www.justynamaksajda.com` (the address used in links; `https://justynamaksajda.pages.dev` while testing)
+   - `PUBLIC_TURNSTILE_SITE_KEY` = the Turnstile site key
+   - `TURNSTILE_SECRET_KEY` = the Turnstile secret key (*Secret*)
+   - `RESEND_API_KEY` = the Resend key (*Secret*)
+   - `ENQUIRY_TO` = `justyna.joanna.maksajda@gmail.com`
+   - `ENQUIRY_FROM` = `Strona – Justyna Maksajda <formularz@justynamaksajda.com>`
+
+   Variables are read at build time, so redeploy after changing them (*Deployments → … → Retry deployment*).
+6. **Admin login.** Deploy the [Sveltia CMS Authenticator](https://github.com/sveltia/sveltia-cms-auth) worker with its *Deploy to Cloudflare* button. Create a GitHub OAuth app (*GitHub → Settings → Developer settings → OAuth Apps → New OAuth App*) with the callback `https://<worker address>/callback`. In the worker's *Settings → Variables and Secrets*, add `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` (*Secret*) and `ALLOWED_DOMAINS` = `www.justynamaksajda.com, justynamaksajda.pages.dev`. Put the worker address in `backend.base_url` in `public/admin/config.yml`.
+7. **Domain.**
+   - In Cloudflare Pages, *Custom domains → Set up a custom domain* → `www.justynamaksajda.com`.
+   - In Netlify, *Domain management*: make `justynamaksajda.com` the primary domain and **remove `www.justynamaksajda.com` from the project's domains**. Netlify must not answer for `www` any more, or it would forward it to itself, and its HTTPS certificate should only cover the bare domain.
+   - In Netlify's DNS settings (*Domains → justynamaksajda.com*), replace the `www` record with a CNAME record `www` → `justynamaksajda.pages.dev`.
+   - Switch Netlify's builds on once so it deploys the forwarding from `netlify.toml`, then stop builds again.
+
+The contact form protects itself with a hidden honeypot field and the Turnstile check. If an email can't be sent, the visitor is asked to write to Justyna directly, and the reason is in the Pages project's *Functions* logs.
 
 ## How Justyna edits the site
 
@@ -68,15 +88,14 @@ To try the admin panel locally, open http://localhost:4321/admin/index.html in C
    - **Price.** Optional. It only appears if you fill it in.
    - **Order within the year.** Works are sorted newest year first. Within the same year, lower numbers come first.
    - **Hide from the website.** Keeps a work in the admin panel but takes it off the site.
-3. Click **Save** (*Zapisz* in a Polish browser). Saving doesn't change the website yet, so save as often as you like. (The arrow next to Save also offers *Save and Publish* / *Zapisz i opublikuj*, which publishes at once; there's rarely a reason to use it.)
-4. When you've finished a batch of changes, click **Publish Changes** (*Opublikuj zmiany*) at the top of the admin panel. The site updates in about 1–2 minutes. The free plan allows about 20 updates a month, so publish once at the end of an editing session rather than after every save. Deleting a work, category or image publishes straight away, together with everything saved before it. If the site hasn't changed after a few minutes, check *Deploys* on Netlify: the button only reports that the update was requested, not that it finished.
-5. **Categories** lists the filters above the gallery (e.g. *Large formats*). Add, rename or describe a category here, and use **Reorder** to change their order on the site. Each category has a **web address** (e.g. `rysunki` → `/series/rysunki/`), set when you create it. Renaming a category keeps its works and its address; changing the address breaks old links to it.
-6. **Pages → Home page** picks the works in the home page slideshow. Add works and drag them into the order you want. It also holds the short text under the slideshow.
-7. **Pages → About** edits the biography and exhibitions in both languages. You can also add a portrait photo there.
-8. **Settings → Site details & contact** changes the email, phone, Instagram link and the contact page text.
+3. Click **Save** (*Zapisz* in a Polish browser). The site updates in about 1–2 minutes.
+4. **Categories** lists the filters above the gallery (e.g. *Large formats*). Add, rename or describe a category here, and use **Reorder** to change their order on the site. Each category has a **web address** (e.g. `rysunki` → `/series/rysunki/`), set when you create it. Renaming a category keeps its works and its address; changing the address breaks old links to it.
+5. **Pages → Home page** picks the works in the home page slideshow. Add works and drag them into the order you want. It also holds the short text under the slideshow.
+6. **Pages → About** edits the biography and exhibitions in both languages. You can also add a portrait photo there.
+7. **Settings → Site details & contact** changes the email, phone, Instagram link and the contact page text.
 
 The works imported from the old Wix site have placeholder titles (*Szkic nr 12* / *Sketch no. 12*, …). Rename them in the admin panel. The web address of a work stays the same when you rename it.
 
 ## Languages and fixed texts
 
-Texts that aren't content (menu, buttons, form labels) are in `src/lib/i18n.ts`. Polish is the main language, at the site root (`DEFAULT_LOCALE` there, `default_locale` in `public/admin/config.yml`). English translations are stored under `en:` in the content files, which `src/content.config.ts` and `src/lib/works.ts` rely on, and `/en/` has its own 404 page (`src/pages/en/404.astro` and a rule in `netlify.toml`). Swapping the main language means changing all of these and moving the texts in the content files.
+Texts that aren't content (menu, buttons, form labels) are in `src/lib/i18n.ts`. Polish is the main language, at the site root (`DEFAULT_LOCALE` there, `default_locale` in `public/admin/config.yml`). English translations are stored under `en:` in the content files, which `src/content.config.ts` and `src/lib/works.ts` rely on, and `/en/` has its own 404 page (`src/pages/en/404.astro`, copied to `/en/404.html` by `astro.config.mjs`). Swapping the main language means changing all of these and moving the texts in the content files.

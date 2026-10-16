@@ -10,6 +10,9 @@ export const getStaticPaths = localeParams;
 const locale = localeFromUrl(Astro.url);
 const t = useTranslations(locale);
 const settings = getSettings(locale);
+// Cloudflare Turnstile bot check; without a site key (e.g. local development) the form is sent without it.
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const sendError = t('contact.errorSend', { email: settings.email });
 
 // Small index of every work so the enquiry list can show thumbnails and titles client-side.
 // Sold / not-for-sale works are only ever referenced by title (?ref=), so they get no thumbnail.
@@ -49,24 +52,27 @@ const index = Object.fromEntries(
           <a class="more" href={localePath(locale, '/works/')}>{t('contact.addMore')}</a>
         </section>
 
+        <!-- Sent to functions/api/enquiry.js, which emails it to Justyna. -->
         <form
+          id="form"
           name="enquiry"
           method="POST"
-          action={localePath(locale, '/thank-you/')}
-          data-netlify="true"
-          netlify-honeypot="bot-field"
+          action="/api/enquiry"
           class="form"
+          data-label-sending={t('contact.sending')}
+          data-label-error-bot={t('contact.errorBot', { email: settings.email })}
+          data-label-error-invalid={t('contact.errorInvalid')}
+          data-label-error-send={sendError}
           data-label-subject={t('contact.subject')}
           data-label-subject-works={t('contact.subjectWorks')}
           data-label-remove={t('contact.remove')}
           data-label-remove-work={t('contact.removeLabel')}
           data-label-regarding={t('contact.regarding')}
         >
-          <input type="hidden" name="form-name" value="enquiry" />
-          <input type="hidden" name="subject" value={t('contact.subject')} data-remove-prefix data-subject />
+          <input type="hidden" name="subject" value={t('contact.subject')} data-subject />
           <input type="hidden" name="language" value={locale} />
           <input type="hidden" name="works" value="" data-works-field />
-          <!-- Ids of the works in the enquiry, for the email with thumbnails (netlify/functions/submission-created.mjs). -->
+          <!-- Ids of the works in the enquiry, for the email with thumbnails. -->
           <input type="hidden" name="work-ids" value="" data-work-ids-field />
           <p class="visually-hidden" aria-hidden="true">
             <label>{t('contact.honeypot')} <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
@@ -75,21 +81,24 @@ const index = Object.fromEntries(
           <div class="row">
             <label>
               <span>{t('contact.name')}</span>
-              <input name="name" type="text" autocomplete="name" required />
+              <input name="name" type="text" autocomplete="name" maxlength="200" required />
             </label>
             <label>
               <span>{t('contact.email')}</span>
-              <input name="email" type="email" autocomplete="email" required />
+              <input name="email" type="email" autocomplete="email" maxlength="254" required />
             </label>
           </div>
           <label>
             <span>{t('contact.phone')} <em>{t('contact.optional')}</em></span>
-            <input name="phone" type="tel" autocomplete="tel" />
+            <input name="phone" type="tel" autocomplete="tel" maxlength="50" />
           </label>
           <label>
             <span>{t('contact.message')}</span>
-            <textarea name="message" rows="7" required></textarea>
+            <textarea name="message" rows="7" maxlength="10000" required></textarea>
           </label>
+          {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-language={locale}></div>}
+          <p class="error" role="alert" data-form-error hidden></p>
+          <noscript><p class="error">{t('contact.noScript', { email: settings.email })}</p></noscript>
           <button class="btn" type="submit">{t('contact.send')}</button>
         </form>
       </div>
@@ -117,6 +126,7 @@ const index = Object.fromEntries(
     </div>
   </div>
   <script type="application/json" id="works-index" set:html={JSON.stringify(index).replace(/</g, '\\u003c')} />
+  {turnstileSiteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 </Base>
 
 <script>
@@ -138,9 +148,56 @@ const index = Object.fromEntries(
   const ref = params.get('ref');
   const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
   if (ref && exists(ref) && message && !message.value) message.value = format(labels.labelRegarding ?? '', { title: index[ref].title });
-  if (params.has('work') || params.has('ref')) history.replaceState(null, '', location.pathname);
+  if (params.has('work') || params.has('ref') || params.has('error')) history.replaceState(null, '', location.pathname);
 
-  document.querySelector('form[name="enquiry"]')?.addEventListener('submit', markSent);
+  // The form is sent with fetch so a problem can be shown without losing what the visitor typed. (A plain post
+  // gets ?error=… back, but the Turnstile check needs JavaScript anyway, hence the <noscript> note.)
+  const form = document.querySelector<HTMLFormElement>('form[name="enquiry"]');
+  const errorBox = document.querySelector<HTMLElement>('[data-form-error]');
+  const errorText: Record<string, string | undefined> = {
+    bot: labels.labelErrorBot,
+    invalid: labels.labelErrorInvalid,
+    send: labels.labelErrorSend,
+  };
+  const showError = (code: string) => {
+    if (!errorBox) return;
+    errorBox.textContent = errorText[code] ?? errorText.send ?? '';
+    errorBox.hidden = false;
+    errorBox.scrollIntoView({ block: 'nearest' });
+  };
+  const errorParam = params.get('error');
+  if (errorParam) showError(errorParam);
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const buttonText = button?.textContent ?? '';
+    if (button) {
+      button.disabled = true;
+      button.textContent = labels.labelSending ?? buttonText;
+    }
+    if (errorBox) errorBox.hidden = true;
+    let lastError = 'send';
+    markSent();
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+      const result: { ok?: boolean; redirect?: string; error?: string } = await res.json();
+      if (result.ok && result.redirect) {
+        location.href = result.redirect;
+        return;
+      }
+      lastError = result.error ?? 'send';
+    } catch {
+      lastError = 'send';
+    }
+    showError(lastError);
+    // A Turnstile token works once; get a new one if the server used it ('invalid' is answered before that).
+    if (lastError !== 'invalid') (window as { turnstile?: { reset: () => void } }).turnstile?.reset();
+    if (button) {
+      button.disabled = false;
+      button.textContent = buttonText;
+    }
+  });
 
   const panel = document.querySelector<HTMLElement>('[data-enquiry-panel]');
   const list = document.querySelector<HTMLUListElement>('[data-enquiry-items]');
@@ -331,6 +388,19 @@ const index = Object.fromEntries(
 
   .form .btn {
     justify-self: start;
+  }
+
+  .form .btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  .error {
+    margin: 0;
+    padding: 12px 16px;
+    border-left: 2px solid var(--sold);
+    background: var(--faint);
+    font-size: 15px;
   }
 
   .details {

@@ -1,18 +1,27 @@
 // Builds the enquiry email Justyna receives when someone sends the contact form: the selected works with
-// thumbnails, then the message. Independent of the hosting platform, so the sending code can change
-// (Netlify function + Resend today) without touching this.
+// thumbnails, then the message. Independent of the hosting platform and email service, so the sending code
+// (functions/api/enquiry.js + Resend today) can change without touching this.
 
 const escape = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-/** Only links back to the site itself are put into the email. */
-const isSiteUrl = (url, siteUrl) => {
+/** Links come from the site's own works index; only ordinary web links are used. */
+const isWebUrl = (url) => {
   try {
-    return new URL(url).origin === new URL(siteUrl).origin;
+    return ['https:', 'http:'].includes(new URL(url).protocol);
   } catch {
     return false;
   }
 };
+
+/** What browsers accept in an email field (the HTML standard's rule), so the form never refuses those. */
+export const isEmailAddress = (value) =>
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
+    value,
+  );
+
+/** A plain address that email services accept as reply-to; others are only shown in the email. */
+const isPlainAddress = (value) => /^[A-Za-z0-9._%+'-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(value);
 
 /**
  * @param {object} args
@@ -30,7 +39,7 @@ export function buildEnquiryEmail({ data, works, siteUrl }) {
   const message = (data.message ?? '').trim();
   const language = data.language === 'en' ? 'angielska' : 'polska';
   // Replying goes straight to the visitor; only a plain address is used, which the email service accepts.
-  const replyTo = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(email) ? email : undefined;
+  const replyTo = isPlainAddress(email) ? email : undefined;
 
   // Ids come from the visitor's browser, so only known works are shown, each once, at most 30.
   const requested = [...new Set(String(data['work-ids'] ?? '').split(',').map((id) => id.trim()).filter(Boolean))];
@@ -53,8 +62,8 @@ export function buildEnquiryEmail({ data, works, siteUrl }) {
 
   const workRows = selected
     .map((w) => {
-      const url = isSiteUrl(w.url, siteUrl) ? w.url : siteUrl;
-      const thumb = isSiteUrl(w.thumb, siteUrl) ? w.thumb : '';
+      const url = isWebUrl(w.url) ? w.url : siteUrl;
+      const thumb = isWebUrl(w.thumb) ? w.thumb : '';
       const meta = [w.year, w.dimensions].filter(Boolean).join(' · ');
       return `<tr>
   <td style="padding:8px 16px 8px 0;vertical-align:top;width:120px">${
@@ -72,7 +81,7 @@ export function buildEnquiryEmail({ data, works, siteUrl }) {
 
   const contactRows = [
     ['Imię i nazwisko', escape(name)],
-    ['E-mail', email ? `<a href="mailto:${escape(email)}">${escape(email)}</a>` : ''],
+    ['E-mail', replyTo ? `<a href="mailto:${escape(encodeURIComponent(email).replace(/%40/, '@'))}">${escape(email)}</a>` : escape(email)],
     ['Telefon', phone ? `<a href="tel:${escape(phone.replace(/\s+/g, ''))}">${escape(phone)}</a>` : ''],
     ['Wersja strony', language],
   ]
@@ -108,7 +117,7 @@ ${
 <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:15px">
 ${contactRows}
 </table>
-<p style="margin:24px 0 0;font-size:13px;color:#7a7a7a">${replyTo ? 'Odpowiedź na tego maila trafi bezpośrednio do nadawcy.' : 'Adres nadawcy wygląda na niepoprawny – sprawdź go przed odpowiedzią.'}</p>
+<p style="margin:24px 0 0;font-size:13px;color:#7a7a7a">${replyTo ? 'Odpowiedź na tego maila trafi bezpośrednio do nadawcy.' : 'Odpowiadając, wpisz adres nadawcy ręcznie (podany wyżej).'}</p>
 </div>
 </body>
 </html>`;
