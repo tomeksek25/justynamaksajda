@@ -19,5 +19,3 @@ en:
   body: ''
   imageAlt: ''
 ---
-
-**Description** _description_
