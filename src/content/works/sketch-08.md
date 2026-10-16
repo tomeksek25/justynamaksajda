@@ -1,14 +1,21 @@
 ---
-title: "Szkic nr 8"
-year: "2018–2019"
-series: painting-sketches
-medium: "Akryl i olej na płycie"
-dimensions: "19 × 19 cm"
+lang:
+  - pl
+  - en
+title: Szkic nr 8
 image: ../../assets/works/sketch-08.jpg
-availability: ""
-price: ""
+series: painting-sketches
+year: 2018–2019
+medium: Akryl i olej na płycie
+dimensions: 19 × 19 cm
+availability: sold
+price: ''
+imageAlt: ''
 order: 80
+draft: false
 en:
-  title: "Sketch no. 8"
-  medium: "Acrylic and oil on board"
+  title: Sketch no. 8
+  medium: Acrylic and oil on board
+  body: ''
+  imageAlt: ''
 ---
