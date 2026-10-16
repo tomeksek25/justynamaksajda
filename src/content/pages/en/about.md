@@ -1,62 +1,67 @@
 ---
-title: About
+title: O mnie
 portrait: ''
 portraitCaption: ''
 ---
 
-Justyna Maksajda graduated with distinction from the Władysław Strzemiński Academy of Fine Arts in Łódź in 2018 (her diploma was shown at PRIME TIME 2018, the exhibition of the Academy's best diplomas). She held a scholarship at ESAD Grenoble, France, in 2016–2017, and is also a graduate of the WSA in Warsaw.
+Twórczość w zakresie malarstwa, rysunku i grafiki artystycznej.
 
-She won the GRAND PRIX of the 35th Władysław Strzemiński Competition (2018) and received awards and distinctions in the Hommage à Kobro (2016) and Hommage à l'Avant-garde (2017) competitions and at the 28th National Review of Young Painting in Legnica. She has taken part in numerous group exhibitions and art projects. She works mostly in painting, drawing and printmaking.
+Dyplom z wyróżnieniem na Akademii Sztuk Pięknych im. Władysława Strzemińskiego w Łodzi w 2018 roku (wystawa najlepszych dyplomów ASP PRIME TIME 2018). Stypendium w ESAD Grenoble (Francja) 2016–2017. 
 
-## Selected exhibitions
+Laureatka GRAND PRIX w 35. edycji konkursu im. Władysława Strzemińskiego (2018); nagrody i wyróżnienia w konkursach Hommage à Kobro (2016), Hommage à l'Avant-garde (2017) i 28. Ogólnopolskim Przeglądzie Malarstwa Młodych w Legnicy (2018) Uczestniczka rezydencji artystycznej Audankunststiftung w Lehniner Instytut für Kunst und Kultur w 2020 roku.
+
+## Wybrane wystawy
+
+**2024**
+
+- Wewnętrzna konieczność, wystawa zbiorowa w ramach Lodz Abstract Art Festival, Galeria S35, Łódź 
+
+**2022**
+
+- _7. Ogólnopolski Konkurs dla Młodych Artystów im. Mariana Michalika,_ nagroda Starosty Częstochowskiego za cykl prac teraz/chwila obecna, Częstochowa 
+
+**2021**
+
+- _Friendship_, wystawa zbiorowa, Galeria Pula/Galeria Pet Kula Motovun, Chorwacja
 
 **2020**
 
-- *chwila obecna – teraz* (the present moment – now), solo exhibition closing the Audankunststiftung Artist in Residence programme 2020, Lehniner Institut für Kunst und Kultur, Lehnin, Germany
-- *Bezruch* (Stillness), solo exhibition, Krupa Gallery, Wrocław
-- *Dobra forma*, exhibition of graduates of the Academy of Fine Arts in Łódź, BWA Sieradz
+- _chwila obecna – teraz_, wystawa indywidualna, Lehniner Instytut für Kunst im Kultur, Lehnin, Niemcy
+- _Bezruch_, wystawa indywidualna, Galeria Krupa, Wrocław
+- _Dobra forma_, wystawa absolwentów Akademii Sztuk Pięknych w Łodzi, BWA Sieradz
 
 **2019**
 
-- 11th Triennial of Small Painting Forms, post-competition exhibition, Toruń
-- *Returns*, painting exhibition, Barlickiego 30, Tomaszów Mazowiecki
-- *First Stone*, group exhibition, BRUKOWA Gallery, Łódź
-- PRIME TIME, exhibition of the best diplomas, Academy of Fine Arts, Łódź
+- _XI Triennale Małych Form Malarskich_, wystawa pokonkursowa, Toruń
+- _Powroty_, wystawa malarstwa, Barlickiego 30, Tomaszów Mazowiecki
+- _Pierwszy kamień_, wystawa zbiorowa, Galeria BRUKOWA, Łódź
+- _PRIME TIME_, wystawa najlepszych dyplomów, Akademia Sztuk Pięknych, Łódź
 
 **2018**
 
-- 28th National Review of Young Painting "PROMOCJE 2018", Honourable Mention of the Director of the Legnica Art Gallery, Galeria Sztuki w Legnicy
-- Exhibition of the Woodcut and Artist's Book Studio, Museum of the Artist's Book, Łódź
-- 35th Władysław Strzemiński Competition, post-competition exhibition, **GRAND PRIX**, Ośrodek Propagandy Sztuki, Łódź
+- _28. Ogólnopolski Przegląd Malarstwa Młodych „PROMOCJE 2018”_, wyróżnienie honorowe Dyrektora Galerii Sztuki w Legnicy, Galeria Sztuki w Legnicy
+- _Wystawa Pracowni Drzeworytu i Książki Artystycznej_, Muzeum Książki Artystycznej, Łódź
+- _35. Konkurs im. Władysława Strzemińskiego_, wystawa pokonkursowa, **GRAND PRIX**, Ośrodek Propagandy Sztuki, Łódź
 
 **2017**
 
-- *Hommage à l'Avant-garde*, post-competition exhibition, 3rd prize, Academy of Fine Arts, Łódź
-- *Między halo a mandalą*, Poleski Ośrodek Sztuki, Łódź
-- Graphics Open 2 – International Biennial of Student Printmaking, Hungarian University of Fine Arts, Budapest
-- *Mała forma graficzna*, post-competition exhibition, Amcor Gallery, Łódź
+- _Hommage à l'Avant-garde_, wystawa pokonkursowa, III nagroda, Akademia Sztuk Pięknych, Łódź
+- _Między halo a mandalą_, Poleski Ośrodek Sztuki, Łódź
+- _Graphics Open 2_ – Międzynarodowe Biennale Grafiki Studenckiej, Węgierski Uniwersytet Sztuk Pięknych, Budapeszt
+- _Mała forma graficzna_, wystawa pokonkursowa, Galeria Amcor, Łódź
 
 **2016**
 
-- Solo exhibition of paintings 2015–2016, LOKAL, Łódź
-- Painting in public space, BOAT Gallery, Łódź
-- Exhibition of studio 211 students, Dominican Monastery Gallery, Łódź
-- *Eksperymentarium i goście*, review of student printmaking, ASP Gallery Piotrkowska 68, Łódź
-- *Chartów*, post-plein-air exhibition, ASP Gallery Nasza Ściana, Łódź
-- *Hommage à Kobro*, post-competition exhibition, Jury Distinction for *Podział płaszczyzny* (Division of the Plane), CPM ASP, Łódź
-- Drawing Department exhibition, Łódź Festival of Science and Art, Łódź
+- Wystawa indywidualna, LOKAL, Łódź
+- Malarstwo w przestrzeni publicznej, Galeria BOAT, Łódź
+- _Eksperymentarium i goście_, przegląd grafiki studenckiej, Galeria ASP Piotrkowska 68, Łódź
+- _Chartów_, wystawa poplenerowa, Galeria ASP Nasza Ściana, Łódź
+- _Hommage à Kobro_, wystawa pokonkursowa, wyróżnienie jury za pracę _Podział płaszczyzny_, CPM ASP, Łódź
+- Wystawa Katedry Rysunku, Festiwal Nauki, Techniki i Sztuki, Łódź
 
 **2013–2015**
 
-- *Bolestraszyce*, post-plein-air exhibition, ASP Gallery Nasza Ściana, Łódź (2015)
-- *Na tych samych sztalugach*, studio 210 exhibition, "Pod napięciem" Gallery, Łódź University of Technology (2014)
-- *Kopie Mistrzów* (Copies of the Masters), group exhibition, Dominican Monastery Gallery, Łódź (2014)
-- *Szkicmistrze*, sketches and drawings of studio 210, ASP Gallery Nasza Ściana, Łódź (2014)
-- *My Colouring… wall*, mural inspired by Pauline Boty and pop art, Muzeum Sztuki ms2, Łódź (2014)
-- Postgraduate painting exhibition, Dwóch Takich, Krakowskie Przedmieście 11, Warsaw (2013)
-
-## En français
-
-Diplômée avec distinction de l'Académie des Beaux-Arts Władysław Strzemiński à Łódź en 2018 (exposition des meilleurs diplômes ASP PRIME TIME 2018). Bourse d'étude à l'ESAD Grenoble (France) 2016–2017. Diplômée de la WSA (Warsaw School of Art) à Varsovie.
-
-Lauréate du GRAND PRIX de la 35e édition du concours Władysław Strzemiński (2018) ; prix et distinctions dans les concours Hommage à Kobro (2016), Hommage à l'Avant-garde (2017) et 28e Revue nationale des jeunes peintres de Legnica. Nombreuses participations à des expositions de groupe et projets artistiques. Travaille majoritairement avec les médias de la peinture, du dessin et du graphisme artistique.
+- _Bolestraszyce_, wystawa poplenerowa, Galeria ASP Nasza Ściana, Łódź (2015)
+- _Na tych samych sztalugach_, wystawa pracowni 210, Galeria „Pod napięciem”, Politechnika Łódzka (2014)
+- _My Colouring… wall_, mural inspirowany twórczością Pauline Boty i pop-artem, Muzeum Sztuki ms2, Łódź (2014)
+- Wystawa indywidualna, Dwóch Takich, Krakowskie Przedmieście 11, Warszawa (2013)
