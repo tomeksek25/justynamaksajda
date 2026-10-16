@@ -15,8 +15,20 @@ backend:
 logo:
   src: /favicon.svg
 
+# Edit Polish and English side by side instead of showing a preview.
+editor:
+  preview: false
+
+# Polish is the main language (site root); English pages live under /en/. Keep in sync with src/lib/i18n.ts.
+# The Polish text is stored at the top level of each file and the English translation under `en:`.
+# An English field left empty shows the Polish text on the English site.
+i18n:
+  structure: single_file_default_root
+  locales: [pl, en]
+  default_locale: pl
+
 # Fallback location for uploads; each collection below sets its own folder.
-media_folder: src/assets/uploads
+media_folder: /src/assets/uploads
 public_folder: /src/assets/uploads
 
 media_libraries:
@@ -40,23 +52,26 @@ collections:
   - name: works
     label: Works
     label_singular: Work
-    description: Paintings and other works shown in the gallery.
+    icon: palette
+    description: Paintings shown in the gallery. Polish on the left, English on the right.
     folder: src/content/works
     create: true
     delete: true
+    i18n: true
     slug: '{{title}}'
-    # Images are stored next to the site sources so they are optimised at build time.
-    media_folder: ../../assets/works
+    # Images live in src/assets/works so Astro optimises them; entries refer to them relative to the
+    # entry file. The absolute media_folder lets the admin panel find and show them.
+    media_folder: /src/assets/works
     public_folder: ../../assets/works
     thumbnail: image
-    summary: '{{title}} — {{year}}'
+    summary: "{{title}} — {{year}}{{draft | ternary(' (hidden)', '')}}"
     sortable_fields:
       fields: [year, title, order, series]
       default:
         field: year
         direction: descending
     view_groups:
-      - label: Series
+      - label: Category
         field: series
       - label: Year
         field: year
@@ -67,9 +82,6 @@ collections:
       - label: Sold
         field: availability
         pattern: sold
-      - label: On home page
-        field: featured
-        pattern: true
       - label: Hidden
         field: draft
         pattern: true
@@ -77,31 +89,36 @@ collections:
       - name: title
         label: Title
         widget: string
+        i18n: true
+        required: [pl]
+        hint_localized:
+          en: Leave empty to use the Polish title.
       - name: image
         label: Image
         widget: image
         # Only formats Astro can process; phones convert HEIC to JPEG when this list is given.
         accept: image/jpeg,image/png,image/webp,image/avif
         hint: Upload a good photo of the work (JPG, PNG or WebP). It is resized automatically.
+      - name: series
+        label: Category
+        widget: relation
+        collection: series
+        value_field: id
+        display_fields: [title]
+        search_fields: [title]
+        dropdown_threshold: 8
+        hint: Categories are managed under **Categories** in the menu.
       - name: year
         label: Year
         widget: string
         required: false
         hint: For example 2024 or 2023–2024.
-      - name: series
-        label: Series
-        widget: select
-        default: large-formats
-        options:
-          - { label: Large formats, value: large-formats }
-          - { label: Painting sketches, value: painting-sketches }
-          - { label: Other works, value: other-works }
-          - { label: Photography, value: photography }
       - name: medium
         label: Medium
         widget: string
+        i18n: true
         required: false
-        hint: For example “Acrylic and oil on canvas”.
+        hint: For example “Akryl i olej na płótnie” / “Acrylic and oil on canvas”.
       - name: dimensions
         label: Dimensions
         widget: string
@@ -125,6 +142,7 @@ collections:
       - name: body
         label: Description
         widget: markdown
+        i18n: true
         required: false
         hint: Optional text shown next to the work.
         buttons: [bold, italic, link, bulleted-list]
@@ -132,55 +150,119 @@ collections:
       - name: imageAlt
         label: Image description for screen readers
         widget: string
+        i18n: true
         required: false
         hint: Optional. If empty, the title, year, medium and dimensions are used.
-      - name: featured
-        label: Show on the home page slideshow
-        widget: boolean
-        default: false
-        required: false
       - name: order
-        label: Order
+        label: Order within the year
         widget: number
         value_type: int
         default: 100
         required: false
-        hint: Works are sorted by year (newest first). Within the same year, lower numbers come first.
+        hint: Works are shown newest year first. Within the same year, lower numbers come first.
       - name: draft
         label: Hide from the website
         widget: boolean
         default: false
         required: false
+        hint: The work stays here in the admin panel but disappears from the site.
+
+  - name: series
+    label: Categories
+    label_singular: Category
+    icon: folder
+    description: Groups of works shown as filters above the gallery. Use Reorder to change their order on the site.
+    # All categories are stored in one file, in the order they appear on the site.
+    file: src/data/series.json
+    create: true
+    delete: true
+    i18n: true
+    identifier_field: title
+    summary: '{{title}}'
+    fields:
+      - name: title
+        label: Name
+        widget: string
+        i18n: true
+        required: [pl]
+      # Works refer to their category by this generated id, so neither renaming the category nor changing its
+      # address cuts it off from its works.
+      - { name: id, label: ID, widget: hidden, default: '{{uuid_short}}' }
+      - name: slug
+        label: Web address
+        widget: string
+        unique: true
+        pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', 'Use lowercase letters without Polish characters, digits and hyphens, e.g. rysunki']
+        hint: >-
+          The end of the page address, e.g. `rysunki` gives /series/rysunki/ (and /en/series/rysunki/). Lowercase
+          letters without Polish characters, digits and hyphens. Changing it later breaks old links to the category.
+      - name: description
+        label: Description
+        widget: text
+        i18n: true
+        required: false
+        hint: Optional short text shown above the works in this category.
 
   - name: pages
     label: Pages
+    icon: description
+    i18n: true
     files:
+      - name: home
+        label: Home page
+        file: src/data/home.json
+        format: json
+        i18n: true
+        fields:
+          - name: slides
+            label: Slideshow
+            label_singular: work
+            widget: list
+            required: false
+            hint: The works shown on the home page, in this order. Drag to reorder. If empty, the newest works are shown.
+            field:
+              name: work
+              label: Work
+              widget: relation
+              collection: works
+              display_fields: ['{{title}} — {{year}}']
+              search_fields: [title, year]
+          - { name: tagline, label: Tagline, widget: string, i18n: true, required: false, hint: 'Small line under the slideshow, e.g. “Malarstwo · Rysunek · Grafika”.' }
+          - { name: intro, label: Short introduction, widget: text, i18n: true, required: false }
       - name: about
         label: About
-        file: src/content/pages/about.md
-        media_folder: ../../assets/pages
-        public_folder: ../../assets/pages
+        # One file per language: src/content/pages/pl/about.md and src/content/pages/en/about.md.
+        file: src/content/pages/{{locale}}/about.md
+        i18n: true
+        media_folder: /src/assets/pages
+        public_folder: ../../../assets/pages
         fields:
-          - { name: title, label: Page title, widget: string }
-          - { name: portrait, label: Portrait photo, widget: image, required: false, accept: "image/jpeg,image/png,image/webp,image/avif" }
-          - { name: portraitCaption, label: Portrait caption, widget: string, required: false }
-          - { name: body, label: Text, widget: markdown }
+          - { name: title, label: Page title, widget: string, i18n: true }
+          - name: portrait
+            label: Portrait photo
+            widget: image
+            i18n: duplicate
+            required: false
+            accept: image/jpeg,image/png,image/webp,image/avif
+          - { name: portraitCaption, label: Portrait caption, widget: string, i18n: true, required: false }
+          - { name: body, label: Text, widget: markdown, i18n: true }
 
   - name: settings
     label: Settings
+    icon: settings
+    i18n: true
     files:
       - name: site
         label: Site details & contact
         file: src/data/settings.json
         format: json
+        i18n: true
         fields:
           - { name: artistName, label: Artist name, widget: string }
-          - { name: tagline, label: Tagline (home page), widget: string, required: false }
-          - { name: homeIntro, label: Short introduction (home page), widget: text, required: false }
-          - { name: location, label: Location, widget: string, required: false }
+          - { name: location, label: Location, widget: string, i18n: true, required: false }
           - { name: email, label: Email, widget: string, required: false }
           - { name: phone, label: Phone, widget: string, required: false }
           - { name: instagram, label: Instagram link, widget: string, required: false, hint: "Full address, e.g. https://www.instagram.com/…" }
           - { name: facebook, label: Facebook link, widget: string, required: false }
-          - { name: contactIntro, label: Contact page text, widget: text, required: false }
-          - { name: siteDescription, label: Description for search engines, widget: text, required: false }
+          - { name: contactIntro, label: Contact page text, widget: text, i18n: true, required: false }
+          - { name: siteDescription, label: Description for search engines, widget: text, i18n: true, required: false }

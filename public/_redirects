@@ -1,0 +1,30 @@
+# Addresses used by the first version of the site (October 2026).
+# That site was in English; categories now have Polish addresses.
+/series/large-formats/      /en/series/duze-formaty/      301
+/series/painting-sketches/  /en/series/szkice-malarskie/  301
+# The Photography and Other works categories and their works were removed.
+/series/photography/  /works/  301
+/series/other-works/  /works/  301
+/works/photograph-01/     /works/  301
+/works/photograph-02/     /works/  301
+/works/photograph-03/     /works/  301
+/works/photograph-04/     /works/  301
+/works/photograph-05/     /works/  301
+/works/photograph-06/     /works/  301
+/works/photograph-07/     /works/  301
+/works/photograph-08/     /works/  301
+/works/photograph-09/     /works/  301
+/works/photograph-10/     /works/  301
+/works/untitled-01/       /works/  301
+/works/untitled-02/       /works/  301
+/works/untitled-03/       /works/  301
+/works/untitled-04/       /works/  301
+/works/untitled-05/       /works/  301
+/works/untitled-06/       /works/  301
+/works/untitled-07/       /works/  301
+/works/untitled-08/       /works/  301
+/works/untitled-09/       /works/  301
+/works/untitled-10/       /works/  301
+/works/untitled-11/       /works/  301
+/works/untitled-12/       /works/  301
+/works/untitled-13/       /works/  301

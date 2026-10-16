@@ -1,12 +1,14 @@
 ---
-title: "Sketch no. 19"
+title: "Szkic nr 19"
 year: "2016–2017"
 series: painting-sketches
-medium: "Acrylic and oil on board"
+medium: "Akryl i olej na płycie"
 dimensions: "19 × 19 cm"
 image: ../../assets/works/sketch-19.jpg
 availability: ""
 price: ""
-featured: false
 order: 190
+en:
+  title: "Sketch no. 19"
+  medium: "Acrylic and oil on board"
 ---

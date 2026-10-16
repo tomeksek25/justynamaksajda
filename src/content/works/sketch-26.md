@@ -1,12 +1,14 @@
 ---
-title: "Sketch no. 26"
+title: "Szkic nr 26"
 year: "2015"
 series: painting-sketches
-medium: "Acrylic and oil on board"
+medium: "Akryl i olej na płycie"
 dimensions: "19 × 19 cm"
 image: ../../assets/works/sketch-26.jpg
 availability: ""
 price: ""
-featured: false
 order: 260
+en:
+  title: "Sketch no. 26"
+  medium: "Acrylic and oil on board"
 ---

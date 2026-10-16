@@ -1,0 +1,335 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import EnquiryToggle from '../../../components/EnquiryToggle.astro';
+import { LOCALES, localeFromUrl, localeParam, localePath, useTranslations } from '../../../lib/i18n';
+import { findSeries, seriesUrl } from '../../../lib/series';
+import { getSettings } from '../../../lib/settings';
+import {
+  availabilityLabel,
+  canEnquire,
+  getWorks,
+  workDescription,
+  workText,
+  workUrl,
+  type Work,
+} from '../../../lib/works';
+
+export async function getStaticPaths() {
+  const works = await getWorks();
+  return LOCALES.flatMap((locale) =>
+    works.map((work, i) => ({
+      params: { lang: localeParam(locale), slug: work.id },
+      props: {
+        work,
+        prev: works[i - 1] as Work | undefined,
+        next: works[i + 1] as Work | undefined,
+      },
+    })),
+  );
+}
+
+const { work, prev, next } = Astro.props;
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+const settings = getSettings(locale);
+const { year, dimensions, availability, price, series, image } = work.data;
+const text = workText(work, locale);
+const { title, medium, alt, lang } = text;
+const description = await workDescription(work, locale);
+const prevText = prev && workText(prev, locale);
+const nextText = next && workText(next, locale);
+const category = findSeries(series, locale);
+const large = await getImage({ src: image, width: Math.min(image.width, 2000), format: 'webp' });
+const og = await getImage({ src: image, width: Math.min(image.width, 1200), format: 'jpg' });
+const enquirable = canEnquire(work);
+---
+
+<Base title={title} description={`${text.summary} – ${t('work.by', { artist: settings.artistName })}.`} image={og.src}>
+  <div class="container work">
+    <nav class="crumbs" aria-label={t('work.breadcrumb')}>
+      <a href={localePath(locale, '/works/')}>{t('works.title')}</a>
+      {
+        category && (
+          <>
+            <span aria-hidden="true">/</span>
+            <a href={seriesUrl(category, locale)} lang={category.lang.title}>{category.title}</a>
+          </>
+        )
+      }
+    </nav>
+
+    <div class="layout">
+      <figure class="image">
+        <button type="button" class="zoom" data-zoom>
+          <span class="visually-hidden">{t('work.enlarge')}</span>
+          <Image
+            src={image}
+            alt={alt}
+            widths={[600, 900, 1200, 1600]}
+            sizes="(min-width: 1000px) 60vw, 92vw"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </button>
+      </figure>
+
+      <div class="details">
+        <h1><span class="title" lang={lang.title}>{title}</span>{year && <span class="year">, {year}</span>}</h1>
+        <dl>
+          {medium && (<><dt class="visually-hidden">{t('work.medium')}</dt><dd lang={lang.medium}>{medium}</dd></>)}
+          {dimensions && (<><dt class="visually-hidden">{t('work.dimensions')}</dt><dd>{dimensions}</dd></>)}
+          {price && enquirable && (<><dt class="visually-hidden">{t('work.price')}</dt><dd>{price}</dd></>)}
+        </dl>
+        {availability && <p class={`status status--${availability}`}>{availabilityLabel(availability, locale)}</p>}
+
+        <div class="description prose" lang={description.lang} set:html={description.html} />
+
+        {
+          enquirable && (
+            <div class="cta">
+              <a class="btn" href={localePath(locale, `/contact/?work=${encodeURIComponent(work.id)}`)}>
+                {t('work.enquire')}
+              </a>
+              <EnquiryToggle slug={work.id} title={title} titleLang={lang.title} variant="button" />
+              <p class="hint">{t('work.severalHint')}</p>
+            </div>
+          )
+        }
+        {
+          !enquirable && (
+            <p class="hint">
+              {t('work.unavailable')}{' '}
+              <a href={localePath(locale, `/contact/?ref=${encodeURIComponent(work.id)}`)}>{t('work.getInTouch')}</a>.
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <nav class="pager" aria-label={t('work.more')}>
+      {prevText ? <a href={workUrl(prev!, locale)} rel="prev">← <span class="title" lang={prevText.lang.title}>{prevText.title}</span><span class="short">{t('work.prev')}</span></a> : <span />}
+      <a href={localePath(locale, '/works/')} class="all">{t('works.all')}</a>
+      {nextText ? <a href={workUrl(next!, locale)} rel="next"><span class="title" lang={nextText.lang.title}>{nextText.title}</span><span class="short">{t('work.next')}</span> →</a> : <span />}
+    </nav>
+  </div>
+
+  <dialog class="lightbox" aria-label={title}>
+    <form method="dialog">
+      <button class="close" aria-label={t('work.close')}>×</button>
+    </form>
+    <img src={large.src} alt={alt} loading="lazy" decoding="async" />
+  </dialog>
+</Base>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+  const zoom = document.querySelector('[data-zoom]');
+  zoom?.addEventListener('click', () => dialog?.showModal());
+  // Start loading the large image as soon as the visitor shows intent to open it.
+  const preload = () => {
+    const img = dialog?.querySelector('img');
+    if (img) img.loading = 'eager';
+  };
+  for (const type of ['pointerenter', 'focus', 'touchstart']) zoom?.addEventListener(type, preload, { once: true });
+  // Clicking anywhere outside the close button (including the image) closes the viewer.
+  dialog?.addEventListener('click', (event) => {
+    if (!(event.target as Element).closest('.close')) dialog.close();
+  });
+</script>
+
+<style>
+  .work {
+    padding-top: 32px;
+  }
+
+  .crumbs {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .crumbs a {
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--text);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+
+  .image {
+    margin: 0;
+  }
+
+  .zoom {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  .zoom img {
+    width: auto;
+    max-width: 100%;
+    max-height: 78vh;
+    margin: 0 auto;
+  }
+
+  .details {
+    position: sticky;
+    top: 32px;
+  }
+
+  h1 {
+    font-size: clamp(22px, 2.4vw, 30px);
+    margin: 0 0 16px;
+  }
+
+  .title {
+    font-style: italic;
+  }
+
+  .year {
+    font-style: normal;
+  }
+
+  dl {
+    margin: 0 0 12px;
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .description:not(:empty) {
+    margin: 24px 0;
+  }
+
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    max-width: 340px;
+    margin-top: 32px;
+  }
+
+  .hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-size: 14px;
+  }
+
+  .pager a {
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  .pager a:hover {
+    color: var(--text);
+  }
+
+  .pager [rel='next'] {
+    text-align: right;
+  }
+
+  .pager .short {
+    display: none;
+  }
+
+  .pager .all {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .lightbox {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 24px;
+    border: 0;
+    background: rgba(255, 255, 255, 0.98);
+    cursor: zoom-out;
+  }
+
+  .lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
+
+  .lightbox::backdrop {
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .close {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    font-size: 32px;
+    font-weight: 300;
+    cursor: pointer;
+  }
+
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .details {
+      position: static;
+    }
+
+    .cta {
+      max-width: none;
+    }
+
+    .pager .title {
+      display: none;
+    }
+
+    .pager .short {
+      display: inline;
+    }
+  }
+</style>

@@ -9,3 +9,11 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Netlify uses the first matching rule (public/_redirects comes before these), and this one matches every missing
+# /en/ page, so keep it last.
+# Missing English pages get the English "page not found" page; everything else gets /404.html.
+[[redirects]]
+  from = "/en/*"
+  to = "/en/404/"
+  status = 404

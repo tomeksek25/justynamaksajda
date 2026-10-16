@@ -1,46 +1,77 @@
 ---
-import { settings } from '../lib/settings';
+import { LOCALE_NAMES, languageLinks, localeFromUrl, localePath, stripLocale, useTranslations } from '../lib/i18n';
+import { getSettings } from '../lib/settings';
+
+interface Props {
+  /** False on pages like the 404, which have no counterpart in the other language. */
+  translated?: boolean;
+}
+
+const { translated = true } = Astro.props;
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+const settings = getSettings(locale);
 
 const links = [
-  { href: '/', label: 'Home' },
-  { href: '/works/', label: 'Works' },
-  { href: '/about/', label: 'About' },
-  { href: '/contact/', label: 'Contact' },
+  { path: '/', label: t('nav.home') },
+  { path: '/works/', label: t('nav.works') },
+  { path: '/about/', label: t('nav.about') },
+  { path: '/contact/', label: t('nav.contact') },
 ];
 
-const path = Astro.url.pathname;
+const path = stripLocale(Astro.url.pathname);
+const languages = languageLinks(Astro.url, translated).map((l) => ({ ...l, name: LOCALE_NAMES[l.locale] }));
 const isCurrent = (href: string) =>
   href === '/' ? path === '/' : path.startsWith(href) || (href === '/works/' && path.startsWith('/series/'));
+const contact = localePath(locale, '/contact/');
 ---
 
 <header class="site-header container">
-  <a class="brand" href="/">{settings.artistName}</a>
+  <a class="brand" href={localePath(locale, '/')}>{settings.artistName}</a>
 
-  <a class="enquiry-mobile" href="/contact/" data-enquiry-nav hidden>
-    <span class="label">Enquiry</span> <span class="badge" data-enquiry-count>0</span>
+  <a class="enquiry-mobile" href={contact} data-enquiry-nav hidden>
+    <span class="label">{t('nav.enquiry')}</span> <span class="badge" data-enquiry-count>0</span>
   </a>
 
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-    <span class="visually-hidden">Menu</span>
+    <span class="visually-hidden">{t('nav.menu')}</span>
     <span class="bars" aria-hidden="true"></span>
   </button>
 
-  <nav id="site-nav" class="site-nav" aria-label="Main">
+  <nav id="site-nav" class="site-nav" aria-label={t('nav.label')}>
     <ul>
       {
         links.map((link) => (
           <li>
-            <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+            <a href={localePath(locale, link.path)} aria-current={isCurrent(link.path) ? 'page' : undefined}>
               {link.label}
             </a>
           </li>
         ))
       }
       <li data-enquiry-nav hidden>
-        <a href="/contact/" class="enquiry-link">
-          Enquiry <span class="badge" data-enquiry-count>0</span>
+        <a href={contact} class="enquiry-link">
+          {t('nav.enquiry')} <span class="badge" data-enquiry-count>0</span>
         </a>
       </li>
+    </ul>
+    <ul class="languages" aria-label={t('nav.language')}>
+      {
+        languages.map((l) => (
+          <li>
+            <a
+              href={l.path}
+              hreflang={l.locale}
+              lang={l.locale}
+              aria-current={l.locale === locale ? 'true' : undefined}
+              title={l.name}
+            >
+              <span aria-hidden="true">{l.locale.toUpperCase()}</span>
+              <span class="visually-hidden">{l.name}</span>
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </nav>
 </header>
@@ -99,6 +130,12 @@ const isCurrent = (href: string) =>
     white-space: nowrap;
   }
 
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 2.2vw, 30px);
+  }
+
   .site-nav ul {
     display: flex;
     gap: clamp(16px, 2.2vw, 30px);
@@ -122,8 +159,15 @@ const isCurrent = (href: string) =>
   }
 
   .site-nav a:hover,
-  .site-nav a[aria-current='page'] {
+  .site-nav a[aria-current='page'],
+  .site-nav .languages a[aria-current='true'] {
     color: var(--text);
+  }
+
+  .site-nav .languages {
+    gap: 12px;
+    padding-left: clamp(16px, 2.2vw, 30px);
+    border-left: 1px solid var(--rule);
   }
 
   .enquiry-link,
@@ -255,6 +299,14 @@ const isCurrent = (href: string) =>
     .site-nav a {
       display: block;
       padding: 12px 0;
+    }
+
+    .site-nav .languages {
+      flex-direction: row;
+      gap: 24px;
+      margin-top: 8px;
+      padding-left: 0;
+      border-left: 0;
     }
   }
 </style>

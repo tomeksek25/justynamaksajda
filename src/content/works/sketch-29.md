@@ -1,12 +1,14 @@
 ---
-title: "Sketch no. 29"
+title: "Szkic nr 29"
 year: "2015"
 series: painting-sketches
-medium: "Acrylic and oil on board"
+medium: "Akryl i olej na płycie"
 dimensions: "19 × 19 cm"
 image: ../../assets/works/sketch-29.jpg
 availability: ""
 price: ""
-featured: false
 order: 290
+en:
+  title: "Sketch no. 29"
+  medium: "Acrylic and oil on board"
 ---

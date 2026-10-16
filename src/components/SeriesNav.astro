@@ -1,5 +1,6 @@
 ---
-import { SERIES } from '../data/series';
+import { localeFromUrl, localePath, useTranslations } from '../lib/i18n';
+import { getSeries, seriesUrl } from '../lib/series';
 
 interface Props {
   current?: string;
@@ -7,22 +8,27 @@ interface Props {
 }
 
 const { current, available } = Astro.props;
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
 const items = [
-  { href: '/works/', label: 'All works', active: !current },
-  ...SERIES.filter((s) => available.includes(s.id)).map((s) => ({
-    href: `/series/${s.id}/`,
-    label: s.label,
-    active: current === s.id,
-  })),
+  { href: localePath(locale, '/works/'), label: t('works.all'), lang: undefined, active: !current },
+  ...getSeries(locale)
+    .filter((s) => available.includes(s.id))
+    .map((s) => ({
+      href: seriesUrl(s, locale),
+      label: s.title,
+      lang: s.lang.title,
+      active: current === s.id,
+    })),
 ];
 ---
 
-<nav class="series-nav" aria-label="Series">
+<nav class="series-nav" aria-label={t('works.series')}>
   <ul>
     {
       items.map((item) => (
         <li>
-          <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+          <a href={item.href} lang={item.lang} aria-current={item.active ? 'page' : undefined}>
             {item.label}
           </a>
         </li>

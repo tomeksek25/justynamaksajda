@@ -1,0 +1,23 @@
+---
+import Base from '../../../layouts/Base.astro';
+import SeriesNav from '../../../components/SeriesNav.astro';
+import WorkGrid from '../../../components/WorkGrid.astro';
+import { localeFromUrl, localeParams, useTranslations } from '../../../lib/i18n';
+import { getWorks, seriesWithWorks } from '../../../lib/works';
+
+export const getStaticPaths = localeParams;
+
+const t = useTranslations(localeFromUrl(Astro.url));
+
+const works = await getWorks();
+const available = seriesWithWorks(works);
+---
+
+<Base title={t('works.title')}>
+  <div class="container section">
+    <h1 class="page-title">{t('works.title')}</h1>
+    <SeriesNav available={available} />
+    <WorkGrid works={works} />
+  </div>
+</Base>
+

@@ -1,13 +1,18 @@
 ---
+import { localeFromUrl, useTranslations } from '../lib/i18n';
+
 interface Props {
   slug: string;
   title: string;
+  /** Set when the title is shown untranslated (see workText). */
+  titleLang?: string;
   variant?: 'link' | 'button';
 }
 
-const { slug, title, variant = 'link' } = Astro.props;
-const labelOff = variant === 'button' ? 'Add to enquiry list' : 'Add to enquiry';
-const labelOn = variant === 'button' ? 'In your enquiry list' : 'In enquiry';
+const { slug, title, titleLang, variant = 'link' } = Astro.props;
+const t = useTranslations(localeFromUrl(Astro.url));
+const labelOff = variant === 'button' ? t('enquiry.addLong') : t('enquiry.add');
+const labelOn = variant === 'button' ? t('enquiry.addedLong') : t('enquiry.added');
 ---
 
 <button
@@ -21,5 +26,5 @@ const labelOn = variant === 'button' ? 'In your enquiry list' : 'In enquiry';
 >
   {variant === 'link' && <span class="icon" aria-hidden="true"></span>}
   <span data-label aria-hidden="true">{labelOff}</span>
-  <span class="visually-hidden">Enquiry list: {title}</span>
+  <span class="visually-hidden">{t('enquiry.listPrefix')}<span lang={titleLang}>{title}</span></span>
 </button>

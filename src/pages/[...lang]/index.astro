@@ -1,0 +1,259 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { localeFromUrl, localeParams, localePath, useTranslations } from '../../lib/i18n';
+import { getHome, getSettings, homeLang } from '../../lib/settings';
+import { getWorks, workText, workUrl } from '../../lib/works';
+
+export const getStaticPaths = localeParams;
+
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+const settings = getSettings(locale);
+const home = getHome(locale);
+const works = await getWorks();
+// The slideshow picked in the admin panel, in its order; hidden or deleted works are skipped.
+const byId = new Map(works.map((w) => [w.id, w]));
+const picked = (home.slides ?? []).flatMap((id) => byId.get(id) ?? []);
+const slides = (picked.length ? picked : works.slice(0, 6)).map((work) => ({
+  work,
+  url: workUrl(work, locale),
+  ...workText(work, locale),
+}));
+---
+
+<Base>
+  <h1 class="visually-hidden">{settings.artistName} – {t('home.heading')}</h1>
+  <section class="container hero" aria-roledescription="carousel" aria-label={t('home.slideshow')}>
+    <div class="slides">
+      {
+        slides.map(({ work, url, title, medium, alt, lang }, i) => (
+          <figure
+            class="slide"
+            data-slide
+            aria-roledescription="slide"
+            aria-label={t('home.slideOf', { n: i + 1, total: slides.length })}
+            hidden={i > 0}
+          >
+            <a href={url}>
+              <Image
+                src={work.data.image}
+                alt={alt}
+                widths={[700, 1100, 1500, 1900]}
+                sizes="(min-width: 1200px) 70vw, 92vw"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : 'auto'}
+              />
+            </a>
+            <figcaption>
+              <a href={url}><span class="title" lang={lang.title}>{title}</span>{work.data.year && <>, {work.data.year}</>}</a>
+              <span class="meta">
+                {medium && <span lang={lang.medium}>{medium}</span>}
+                {medium && work.data.dimensions && ' · '}
+                {work.data.dimensions}
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+    {
+      slides.length > 1 && (
+        <div class="controls" data-label-slide={t('home.slideAnnounce')} data-label-play={t('home.play')} data-label-pause={t('home.pause')}>
+          <button type="button" data-prev aria-label={t('home.prev')}>←</button>
+          <span class="counter"><span data-index>1</span> / {slides.length}</span>
+          <span class="visually-hidden" aria-live="polite" data-announce></span>
+          <button type="button" data-next aria-label={t('home.next')}>→</button>
+          <button type="button" class="pause" data-pause aria-pressed="false" hidden>{t('home.pause')}</button>
+        </div>
+      )
+    }
+  </section>
+
+  <section class="container intro">
+    {home.tagline && <p class="eyebrow" lang={homeLang('tagline', locale)}>{home.tagline}</p>}
+    {home.intro && <p class="lead" lang={homeLang('intro', locale)}>{home.intro}</p>}
+    <p class="links">
+      <a href={localePath(locale, '/works/')}>{t('home.viewWorks')}</a> <span aria-hidden="true">·</span>
+      <a href={localePath(locale, '/contact/')}>{t('home.getInTouch')}</a>
+    </p>
+  </section>
+</Base>
+
+<script>
+  import { format } from '../../lib/format';
+
+  const slides = [...document.querySelectorAll<HTMLElement>('[data-slide]')];
+  const indexEl = document.querySelector('[data-index]');
+  const announcer = document.querySelector('[data-announce]');
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const labels: DOMStringMap = document.querySelector<HTMLElement>('.controls')?.dataset ?? {};
+  const total = String(slides.length);
+  let current = 0;
+  let timer: number | undefined;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Start fetching the slide after the current one so it's ready before it fades in.
+  function preloadNext() {
+    const img = slides[(current + 1) % slides.length]?.querySelector('img');
+    if (img) img.loading = 'eager';
+  }
+
+  // Only manual navigation is announced to screen readers, not autoplay.
+  function show(i: number, announce = false) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => (s.hidden = n !== current));
+    if (indexEl) indexEl.textContent = String(current + 1);
+    if (announce && announcer) announcer.textContent = format(labels.labelSlide ?? '', { n: current + 1, total });
+    preloadNext();
+  }
+
+  // Autoplay runs only while the visitor is neither hovering nor focused inside the slideshow.
+  let hovered = false;
+  let focused = false;
+  let paused = false;
+  const autoplay = !reduceMotion && slides.length > 1;
+  const pauseBtn = document.querySelector<HTMLButtonElement>('button[data-pause]');
+
+  function start() {
+    stop();
+    if (!autoplay || hovered || focused || paused) return;
+    timer = window.setInterval(() => show(current + 1), 6000);
+  }
+
+  function stop() {
+    window.clearInterval(timer);
+  }
+
+  // Manual navigation restarts the timer so the chosen slide gets its full time.
+  document.querySelector('[data-prev]')?.addEventListener('click', () => (show(current - 1, true), start()));
+  document.querySelector('[data-next]')?.addEventListener('click', () => (show(current + 1, true), start()));
+  // Touch devices fire enter without a matching leave, so only a real mouse pauses on hover.
+  hero?.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && ((hovered = true), start()));
+  hero?.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && ((hovered = false), start()));
+  hero?.addEventListener('focusin', () => ((focused = true), start()));
+  hero?.addEventListener('focusout', (event) => {
+    focused = hero.contains(event.relatedTarget as Node | null);
+    start();
+  });
+  if (pauseBtn && autoplay) {
+    pauseBtn.hidden = false;
+    pauseBtn.addEventListener('click', () => {
+      paused = !paused;
+      pauseBtn.setAttribute('aria-pressed', String(paused));
+      pauseBtn.textContent = (paused ? labels.labelPlay : labels.labelPause) ?? '';
+      start();
+    });
+  }
+  if (autoplay) preloadNext();
+  start();
+</script>
+
+<style>
+  .hero {
+    padding-top: 56px;
+  }
+
+  .slides {
+    display: grid;
+  }
+
+  .slide {
+    grid-area: 1 / 1;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fade 0.8s ease;
+  }
+
+  .slide[hidden] {
+    display: none;
+  }
+
+  .slide img {
+    width: auto;
+    max-width: 100%;
+    max-height: min(72vh, 900px);
+  }
+
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  figcaption a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .title {
+    font-style: italic;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .controls button {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--muted);
+  }
+
+  .controls .pause {
+    width: auto;
+    padding: 0 8px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .controls button:hover {
+    color: var(--text);
+  }
+
+  .intro {
+    margin-top: 72px;
+    text-align: center;
+  }
+
+  .lead {
+    max-width: 40ch;
+    margin: 12px auto 0;
+    font-size: 18px;
+  }
+
+  .links {
+    margin-top: 8px;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

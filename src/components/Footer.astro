@@ -1,11 +1,16 @@
 ---
-import { settings, socialLinks } from '../lib/settings';
+import { localeFromUrl, useTranslations } from '../lib/i18n';
+import { getSettings, socialLinks } from '../lib/settings';
+
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+const settings = getSettings(locale);
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer container">
-  <p>Copyright © {year} {settings.artistName}</p>
+  <p>{t('footer.copyright', { year, artist: settings.artistName })}</p>
   <ul>
     {settings.email && <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>}
     {

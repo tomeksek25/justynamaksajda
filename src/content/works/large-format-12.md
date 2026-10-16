@@ -1,12 +1,14 @@
 ---
-title: "Large format no. 12"
+title: "Duży format nr 12"
 year: "2016"
 series: large-formats
-medium: "Acrylic and oil on canvas"
+medium: "Akryl i olej na płótnie"
 dimensions: "140 × 140 cm"
 image: ../../assets/works/large-format-12.jpg
 availability: ""
 price: ""
-featured: false
 order: 120
+en:
+  title: "Large format no. 12"
+  medium: "Acrylic and oil on canvas"
 ---

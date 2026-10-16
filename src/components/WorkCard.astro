@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import EnquiryToggle from './EnquiryToggle.astro';
-import { AVAILABILITY_LABELS, canEnquire, workAlt, workUrl, type Work } from '../lib/works';
+import { localeFromUrl } from '../lib/i18n';
+import { availabilityLabel, canEnquire, workText, workUrl, type Work } from '../lib/works';
 
 interface Props {
   work: Work;
@@ -9,31 +10,34 @@ interface Props {
 }
 
 const { work, eager = false } = Astro.props;
-const { title, year, medium, dimensions, availability, image } = work.data;
+const locale = localeFromUrl(Astro.url);
+const { year, dimensions, availability, image } = work.data;
+const { title, medium, alt, lang } = workText(work, locale);
+const url = workUrl(work, locale);
 const showEnquiry = canEnquire(work);
 ---
 
 <article class="work-card">
-  <a class="frame" href={workUrl(work)} tabindex="-1" aria-hidden="true">
+  <a class="frame" href={url} tabindex="-1" aria-hidden="true">
     <Image
       src={image}
-      alt={workAlt(work)}
+      alt={alt}
       widths={[360, 540, 720, 1080]}
       sizes="(min-width: 1440px) 420px, (min-width: 1001px) 30vw, (min-width: 541px) 46vw, 92vw"
       loading={eager ? 'eager' : 'lazy'}
     />
   </a>
   <div class="caption">
-    <h2><a href={workUrl(work)}><span class="title">{title}</span>{year && <>, {year}</>}</a></h2>
-    {medium && <p>{medium}</p>}
+    <h2><a href={url}><span class="title" lang={lang.title}>{title}</span>{year && <>, {year}</>}</a></h2>
+    {medium && <p lang={lang.medium}>{medium}</p>}
     {dimensions && <p>{dimensions}</p>}
     <div class="actions">
       {
         availability && (
-          <span class={`status status--${availability}`}>{AVAILABILITY_LABELS[availability]}</span>
+          <span class={`status status--${availability}`}>{availabilityLabel(availability, locale)}</span>
         )
       }
-      {showEnquiry && <EnquiryToggle slug={work.id} title={title} />}
+      {showEnquiry && <EnquiryToggle slug={work.id} title={title} titleLang={lang.title} />}
     </div>
   </div>
 </article>

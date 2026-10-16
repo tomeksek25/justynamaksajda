@@ -1,0 +1,43 @@
+---
+import Base from '../../../layouts/Base.astro';
+import SeriesNav from '../../../components/SeriesNav.astro';
+import WorkGrid from '../../../components/WorkGrid.astro';
+import { LOCALES, localeFromUrl, localeParam, useTranslations } from '../../../lib/i18n';
+import { getSeries } from '../../../lib/series';
+import { getWorks, seriesWithWorks } from '../../../lib/works';
+
+export async function getStaticPaths() {
+  const all = await getWorks();
+  const available = seriesWithWorks(all);
+  return LOCALES.flatMap((locale) =>
+    getSeries(locale)
+      .filter((s) => available.includes(s.id))
+      .map((s) => ({
+        params: { lang: localeParam(locale), series: s.slug },
+        props: { series: s, available, works: all.filter((w) => w.data.series === s.id) },
+      })),
+  );
+}
+
+const { series, available, works } = Astro.props;
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+---
+
+<Base title={series.title} description={series.description || undefined}>
+  <div class="container section">
+    <h1 class="page-title">{t('works.title')} <span aria-hidden="true">·</span> <span lang={series.lang.title}>{series.title}</span></h1>
+    <SeriesNav current={series.id} available={available} />
+    {series.description && <p class="intro" lang={series.lang.description}>{series.description}</p>}
+    <WorkGrid works={works} />
+  </div>
+</Base>
+
+
+<style>
+  .intro {
+    max-width: 60ch;
+    margin: -16px 0 48px;
+    white-space: pre-line;
+  }
+</style>

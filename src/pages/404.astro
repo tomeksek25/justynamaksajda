@@ -1,16 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import NotFound from '../components/NotFound.astro';
 ---
 
-<Base title="Page not found" canonical={false} noindex>
-  <div class="container section">
-    <h1 class="page-title">Page not found</h1>
-    <p>The page you are looking for doesn't exist. Try the <a href="/works/">works</a> or the <a href="/">home page</a>.</p>
-  </div>
-</Base>
-
-<style>
-  .section {
-    min-height: 40vh;
-  }
-</style>
+<NotFound />

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "large-formats",
+    "slug": "duze-formaty",
+    "title": "Duże formaty",
+    "description": "",
+    "en": {
+      "title": "Large formats",
+      "description": ""
+    }
+  },
+  {
+    "id": "painting-sketches",
+    "slug": "szkice-malarskie",
+    "title": "Szkice malarskie",
+    "description": "",
+    "en": {
+      "title": "Painting sketches",
+      "description": ""
+    }
+  }
+]

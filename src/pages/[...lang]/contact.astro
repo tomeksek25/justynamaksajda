@@ -1,0 +1,354 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { localeFromUrl, localeParams, localePath, useTranslations } from '../../lib/i18n';
+import { getSettings, settingsLang, socialLinks } from '../../lib/settings';
+import { canEnquire, getWorks, workText, workUrl } from '../../lib/works';
+
+export const getStaticPaths = localeParams;
+
+const locale = localeFromUrl(Astro.url);
+const t = useTranslations(locale);
+const settings = getSettings(locale);
+
+// Small index of every work so the enquiry list can show thumbnails and titles client-side.
+// Sold / not-for-sale works are only ever referenced by title (?ref=), so they get no thumbnail.
+const works = await getWorks();
+const index = Object.fromEntries(
+  await Promise.all(
+    works.map(async (w) => {
+      const thumb = canEnquire(w)
+        ? await getImage({ src: w.data.image, width: 160, height: 160, fit: 'contain', format: 'webp' })
+        : undefined;
+      return [
+        w.id,
+        {
+          title: workText(w, locale).title,
+          year: w.data.year,
+          dimensions: w.data.dimensions,
+          url: workUrl(w, locale),
+          thumb: thumb?.src ?? '',
+        },
+      ] as const;
+    }),
+  ),
+);
+---
+
+<Base title={t('contact.title')}>
+  <div class="container section">
+    <h1 class="page-title">{t('contact.title')}</h1>
+
+    <div class="layout">
+      <div>
+        <p class="intro" lang={settingsLang('contactIntro', locale)}>{settings.contactIntro}</p>
+
+        <section class="enquiry" data-enquiry-panel hidden aria-labelledby="enquiry-heading">
+          <h2 id="enquiry-heading" class="eyebrow">{t('contact.inEnquiry')}</h2>
+          <ul data-enquiry-items></ul>
+          <a class="more" href={localePath(locale, '/works/')}>{t('contact.addMore')}</a>
+        </section>
+
+        <form
+          name="enquiry"
+          method="POST"
+          action={localePath(locale, '/thank-you/')}
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          class="form"
+          data-label-subject={t('contact.subject')}
+          data-label-subject-works={t('contact.subjectWorks')}
+          data-label-remove={t('contact.remove')}
+          data-label-remove-work={t('contact.removeLabel')}
+          data-label-regarding={t('contact.regarding')}
+        >
+          <input type="hidden" name="form-name" value="enquiry" />
+          <input type="hidden" name="subject" value={t('contact.subject')} data-remove-prefix data-subject />
+          <input type="hidden" name="language" value={locale} />
+          <input type="hidden" name="works" value="" data-works-field />
+          <p class="visually-hidden" aria-hidden="true">
+            <label>{t('contact.honeypot')} <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+          </p>
+
+          <div class="row">
+            <label>
+              <span>{t('contact.name')}</span>
+              <input name="name" type="text" autocomplete="name" required />
+            </label>
+            <label>
+              <span>{t('contact.email')}</span>
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+          </div>
+          <label>
+            <span>{t('contact.phone')} <em>{t('contact.optional')}</em></span>
+            <input name="phone" type="tel" autocomplete="tel" />
+          </label>
+          <label>
+            <span>{t('contact.message')}</span>
+            <textarea name="message" rows="7" required></textarea>
+          </label>
+          <button class="btn" type="submit">{t('contact.send')}</button>
+        </form>
+      </div>
+
+      <aside class="details">
+        <h2 class="eyebrow">{t('contact.studio')}</h2>
+        <p>{settings.artistName}<br /><span lang={settingsLang('location', locale)}>{settings.location}</span></p>
+        {settings.email && <p><a href={`mailto:${settings.email}`}>{settings.email}</a></p>}
+        {settings.phone && <p><a href={`tel:${settings.phone.replace(/\s+/g, '')}`}>{settings.phone}</a></p>}
+        {
+          socialLinks.length > 0 && (
+            <p>
+              {socialLinks.map((s, i) => (
+                <>
+                  {i > 0 && ' · '}
+                  <a href={s.href} target="_blank" rel="noopener">
+                    {s.label}
+                  </a>
+                </>
+              ))}
+            </p>
+          )
+        }
+      </aside>
+    </div>
+  </div>
+  <script type="application/json" id="works-index" set:html={JSON.stringify(index).replace(/</g, '\\u003c')} />
+</Base>
+
+<script>
+  import { format } from '../../lib/format';
+  import { addWork, getList, markSent, removeWork } from '../../scripts/enquiry';
+
+  type Entry = { title: string; year: string; dimensions: string; url: string; thumb: string };
+  const indexEl = document.getElementById('works-index');
+  const index: Record<string, Entry> = indexEl ? JSON.parse(indexEl.textContent ?? '{}') : {};
+  // Texts in the page's language; {title} and {titles} are filled in below.
+  const labels: DOMStringMap = document.querySelector<HTMLFormElement>('form[name="enquiry"]')?.dataset ?? {};
+
+  // "Enquire about this work" links arrive as /contact/?work=<slug>.
+  const params = new URLSearchParams(location.search);
+  const exists = (slug: string) => Object.prototype.hasOwnProperty.call(index, slug);
+  params.getAll('work').filter(exists).forEach(addWork);
+
+  // Sold / not-for-sale works link here as ?ref=<slug>: mention the work without adding it to the list.
+  const ref = params.get('ref');
+  const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+  if (ref && exists(ref) && message && !message.value) message.value = format(labels.labelRegarding ?? '', { title: index[ref].title });
+  if (params.has('work') || params.has('ref')) history.replaceState(null, '', location.pathname);
+
+  document.querySelector('form[name="enquiry"]')?.addEventListener('submit', markSent);
+
+  const panel = document.querySelector<HTMLElement>('[data-enquiry-panel]');
+  const list = document.querySelector<HTMLUListElement>('[data-enquiry-items]');
+  const worksField = document.querySelector<HTMLInputElement>('[data-works-field]');
+  const subjectField = document.querySelector<HTMLInputElement>('[data-subject]');
+
+  function item(slug: string, work: Entry) {
+    const li = document.createElement('li');
+    const img = document.createElement('img');
+    img.src = work.thumb;
+    img.alt = '';
+    img.width = 64;
+    img.height = 64;
+    const text = document.createElement('div');
+    const link = document.createElement('a');
+    link.href = work.url;
+    link.className = 'title';
+    link.textContent = work.title;
+    text.append(link, work.year ? `, ${work.year}` : '');
+    if (work.dimensions) {
+      const dims = document.createElement('span');
+      dims.className = 'dims';
+      dims.textContent = work.dimensions;
+      text.append(dims);
+    }
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'link-button';
+    remove.textContent = labels.labelRemove ?? '';
+    remove.setAttribute('aria-label', format(labels.labelRemoveWork ?? '', { title: work.title }));
+    remove.addEventListener('click', () => {
+      // Keep keyboard focus in the list: move it to the next item's Remove button, or the form.
+      const buttons = [...(list?.querySelectorAll('button') ?? [])];
+      const i = buttons.indexOf(remove);
+      removeWork(slug);
+      const after = [...(list?.querySelectorAll('button') ?? [])];
+      (after[Math.min(i, after.length - 1)] ?? document.querySelector<HTMLInputElement>('input[name="name"]'))?.focus();
+    });
+    li.append(img, text, remove);
+    return li;
+  }
+
+  function update() {
+    const slugs = getList();
+    if (panel) panel.hidden = slugs.length === 0;
+    list?.replaceChildren(...slugs.map((slug) => item(slug, index[slug])));
+    if (worksField) {
+      worksField.value = slugs
+        .map((slug) => {
+          const w = index[slug];
+          const meta = [w.year, w.dimensions].filter(Boolean).join(', ');
+          return `${w.title}${meta ? ` (${meta})` : ''} – ${new URL(w.url, location.origin).href}`;
+        })
+        .join('\n');
+    }
+    if (subjectField) {
+      const titles = slugs.map((slug) => index[slug].title);
+      subjectField.value = titles.length ? format(labels.labelSubjectWorks ?? '', { titles: titles.join(', ') }) : (labels.labelSubject ?? '');
+    }
+  }
+
+  document.addEventListener('enquiry:change', update);
+  update();
+</script>
+
+<style>
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .intro {
+    margin: 0 0 32px;
+    max-width: 56ch;
+  }
+
+  .enquiry {
+    margin-bottom: 40px;
+    padding: 20px 24px;
+    background: var(--faint);
+  }
+
+  .enquiry h2 {
+    margin: 0 0 12px;
+  }
+
+  .enquiry ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .enquiry :global(li) {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+  }
+
+  .enquiry :global(img) {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    background: var(--bg);
+  }
+
+  .enquiry :global(.title) {
+    font-style: italic;
+    text-decoration: none;
+  }
+
+  .enquiry :global(.dims) {
+    display: block;
+    color: var(--muted);
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .more:hover {
+    color: var(--text);
+  }
+
+  .form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  label em {
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: var(--text);
+    outline: none;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form .btn {
+    justify-self: start;
+  }
+
+  .details {
+    font-size: 15px;
+  }
+
+  .details h2 {
+    margin: 0 0 12px;
+  }
+
+  .details p {
+    margin: 0 0 12px;
+  }
+
+  @media (max-width: 760px) {
+    .layout,
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .enquiry {
+      padding: 16px;
+    }
+  }
+</style>
