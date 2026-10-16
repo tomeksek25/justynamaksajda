@@ -2,8 +2,8 @@
 import { Image, getImage } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import EnquiryToggle from '../../../components/EnquiryToggle.astro';
-import { LOCALES, localeFromUrl, localeParam, localePath, useTranslations } from '../../../lib/i18n';
-import { findSeries, seriesUrl } from '../../../lib/series';
+import { DEFAULT_LOCALE, LOCALES, localeFromUrl, localeParam, localePath, useTranslations } from '../../../lib/i18n';
+import { findSeries, getSeries, seriesUrl } from '../../../lib/series';
 import { getSettings } from '../../../lib/settings';
 import {
   availabilityLabel,
@@ -17,15 +17,24 @@ import {
 
 export async function getStaticPaths() {
   const works = await getWorks();
+  const seriesIds = new Set(getSeries(DEFAULT_LOCALE).map((s) => s.id));
+  // Previous/next stay within the work's category, in gallery order; works without a known category
+  // step through all works.
+  const siblings = (work: Work) =>
+    seriesIds.has(work.data.series) ? works.filter((w) => w.data.series === work.data.series) : works;
   return LOCALES.flatMap((locale) =>
-    works.map((work, i) => ({
-      params: { lang: localeParam(locale), slug: work.id },
-      props: {
-        work,
-        prev: works[i - 1] as Work | undefined,
-        next: works[i + 1] as Work | undefined,
-      },
-    })),
+    works.map((work) => {
+      const list = siblings(work);
+      const i = list.indexOf(work);
+      return {
+        params: { lang: localeParam(locale), slug: work.id },
+        props: {
+          work,
+          prev: list[i - 1] as Work | undefined,
+          next: list[i + 1] as Work | undefined,
+        },
+      };
+    }),
   );
 }
 
@@ -109,7 +118,13 @@ const enquirable = canEnquire(work);
 
     <nav class="pager" aria-label={t('work.more')}>
       {prevText ? <a href={workUrl(prev!, locale)} rel="prev">← <span class="title" lang={prevText.lang.title}>{prevText.title}</span><span class="short">{t('work.prev')}</span></a> : <span />}
-      <a href={localePath(locale, '/works/')} class="all">{t('works.all')}</a>
+      {
+        category ? (
+          <a href={seriesUrl(category, locale)} class="all" lang={category.lang.title}>{category.title}</a>
+        ) : (
+          <a href={localePath(locale, '/works/')} class="all">{t('works.all')}</a>
+        )
+      }
       {nextText ? <a href={workUrl(next!, locale)} rel="next"><span class="title" lang={nextText.lang.title}>{nextText.title}</span><span class="short">{t('work.next')}</span> →</a> : <span />}
     </nav>
   </div>
