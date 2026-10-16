@@ -8,7 +8,7 @@ series: painting-sketches
 year: 2018–2019
 medium: Akryl i olej na płycie
 dimensions: 19 × 19 cm
-availability: available
+availability: ''
 price: ''
 imageAlt: ''
 order: 110
@@ -16,8 +16,6 @@ draft: false
 en:
   title: Sketch no. 11
   medium: Acrylic and oil on board
-  body: This is a default description.
+  body: ''
   imageAlt: ''
 ---
-
-To jest domyślny opis.
